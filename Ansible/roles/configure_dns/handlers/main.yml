@@ -1,0 +1,12 @@
+---
+# handlers file for configure_dns
+- name: Reload NetworkManager service
+  service:
+    name: NetworkManager
+    state: reloaded
+
+- name: Restart NetworkManager service
+  service:
+    name: NetworkManager
+    state: restarted
+  become: yes

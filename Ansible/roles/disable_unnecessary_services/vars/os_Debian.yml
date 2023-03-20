@@ -1,0 +1,6 @@
+---
+packages:
+    - avahi-daemon
+    - ntp
+    - exim4
+

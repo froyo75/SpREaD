@@ -1,0 +1,5 @@
+---
+# defaults file for configure_gandi_dns_records
+
+default_cname_record: mail
+dns_template: default-a

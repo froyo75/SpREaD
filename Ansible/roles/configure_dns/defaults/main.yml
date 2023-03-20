@@ -1,0 +1,10 @@
+---
+# defaults file for configure_dns
+
+resolv_conf_nameservers:
+  - 1.1.1.1
+  - 1.0.0.1
+resolv_conf_search_domains:
+  - "{{ server_domain }}"
+resolv_conf_domains:
+  - "{{ server_domain }}"

@@ -1,0 +1,32 @@
+---
+# tasks file for roles/configure_mailu
+
+- name: Install pwgen utility for generating a new "SECRET_KEY" (using apt tool)
+  apt:
+    update_cache: yes
+    pkg: pwgen
+    state: present
+  when:
+   - ansible_pkg_mgr == "apt"
+  become: yes
+
+- name: Prepare the Mailu environment using 'mailu.env' file
+  template:
+    src: "{{ role_path }}/templates/mailu.env.j2"
+    dest: /opt/mailu/mailu.env
+  become: yes
+
+- name: Setup Mailu DKIM Key
+  copy:
+    src: "dkim/{{ server_domain }}/"
+    dest: /opt/mailu/app/dkim/
+  become: yes
+
+- name: Build and start the containers
+  shell: "cd /opt/{{ docker_app }} && ./{{ docker_startup_script }}"
+  when:
+   - ansible_distribution == "Debian"
+  register: compose
+  become: yes
+
+- debug: var=compose.stdout_lines

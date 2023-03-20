@@ -1,0 +1,41 @@
+---
+# tasks file for setup_docker_container
+
+- name: Install required packages (using apt tool)
+  apt:
+    update_cache: yes
+    pkg: rsync
+    state: present
+  when:
+   - ansible_pkg_mgr == "apt"
+  become: yes
+
+- name: Copy Docker files to the remote host
+  copy:
+    src: "../Docker/{{ docker_app }}"
+    dest: /opt/
+  become: yes
+
+- name: Synchronize permissions
+  synchronize:
+    delete: yes
+    src: "../Docker/{{ docker_app }}/"
+    dest: "/opt/{{ docker_app }}/"
+    mode: push
+    recursive: yes
+  become: yes
+
+- name: Build and start the containers
+  shell: "cd /opt/{{ docker_app }} && ./{{ docker_startup_script }}"
+  when:
+   - ansible_distribution == "Debian"
+  register: compose
+  become: yes
+
+- debug: var=compose.stdout_lines
+
+- name: Save iptables rules
+  shell: iptables-save > /etc/iptables/rules.v4
+  args:
+    executable: /bin/bash
+  become: yes

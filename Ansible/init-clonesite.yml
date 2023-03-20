@@ -1,0 +1,10 @@
+# Install & Configure a Clonesite
+- hosts: clonesite
+  gather_facts: true
+  vars:
+   virtual_host_template: default-https.j2
+   web_service: apache2
+  roles:
+    - configure_letsencrypt
+    - install_apache2
+    - install_clonesite

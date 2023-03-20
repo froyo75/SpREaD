@@ -4,7 +4,7 @@
 
 ## Installation
 
-**Terraform and Ansible are required**
+***Terraform and Ansible are required***
 
 ### 1. Install Ansible & Terraform
 

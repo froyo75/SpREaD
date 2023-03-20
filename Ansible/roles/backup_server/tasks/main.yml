@@ -1,0 +1,31 @@
+---
+# tasks file for backup_server
+
+- name: Run backup script
+  script: scripts/backup.sh
+  register: backup
+  become: yes
+  
+- debug: var=backup.stdout_lines
+
+- name: Find all backup files
+  find:
+    paths: /tmp
+    patterns: "backup-*.tar.gz"
+  register: files_to_delete
+
+- name: Retrieve all backup files
+  fetch:
+    src: "{{ item.path }}"
+    dest: "backup/{{ inventory_hostname }}/"
+    flat: yes
+    validate_checksum: yes
+  with_items: "{{ files_to_delete.files }}"
+  become: yes
+
+- name: Delete all backup files
+  file:
+    path: "{{ item.path }}"
+    state: absent
+  with_items: "{{ files_to_delete.files }}"
+  become: yes

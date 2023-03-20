@@ -1,0 +1,9 @@
+# Install & Configure a new Evilginx2 instance
+- hosts: evilginx2
+  gather_facts: true
+  vars:
+   docker_app : evilginx2
+   docker_startup_script: startEvilGinx2.sh
+  roles:
+    - install_docker
+    - setup_docker_container

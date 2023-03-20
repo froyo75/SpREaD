@@ -1,0 +1,54 @@
+---
+# tasks file for install_docker
+
+- name: Install the required packages (using apt tool)
+  apt:
+    update_cache: yes
+    pkg: 
+    - apt-transport-https
+    - ca-certificates
+    - gnupg
+    - curl
+    - lsb-release
+    - python3-pip
+    - libffi-dev
+    state: present
+  when:
+   - ansible_pkg_mgr == "apt"
+  become: yes
+
+- name: Add Docker’s official GPG key
+  shell: curl -fsSL https://download.docker.com/linux/debian/gpg | gpg --yes --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg
+  when:
+   - ansible_distribution == "Debian"
+  become: yes
+
+- name: Set up the stable repository
+  apt_repository:
+    repo: "deb [arch=amd64 signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/debian {{ ansible_distribution_release }} stable"
+    state: present
+  when:
+   - ansible_distribution == "Debian"
+  become: yes
+
+- name: Install Docker service (using apt tool)
+  apt:
+    update_cache: yes
+    pkg: 
+    - docker-ce
+    - docker-ce-cli
+    - containerd.io
+    state: present
+  when:
+   - ansible_pkg_mgr == "apt"
+  become: yes
+
+- name: Enable Docker service
+  service:
+    name: docker
+    enabled: yes
+  become: yes
+
+- name: Install Docker Compose
+  shell: pip3 install docker-compose
+  become: yes

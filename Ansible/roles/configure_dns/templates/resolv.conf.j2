@@ -1,0 +1,13 @@
+{% for nameserver in resolv_conf_nameservers %}
+nameserver {{ nameserver }}
+{% endfor %}
+{% for domain in resolv_conf_domains %}
+{% if domain %}
+#domain {{ domain }}
+{% endif %}
+{% endfor %}
+{% for search_domain in resolv_conf_search_domains %}
+{% if search_domain %}
+#search {{ search_domain }}
+{% endif %}
+{% endfor %}

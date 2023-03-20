@@ -1,0 +1,21 @@
+---
+# tasks file for change_hostname
+
+- name: Change the hostname
+  tags:
+   - hostname
+  command: "hostnamectl set-hostname {{ inventory_hostname }}"
+  become: yes
+
+- name: Modify the /etc/hosts file for Debian or Raspbian OS
+  tags:
+   - hosts
+  lineinfile:
+    path: /etc/hosts
+    regexp: "^127.0.1.1"
+    line: "127.0.1.1\t{{ inventory_hostname }}"
+    state: present
+  when:
+   - ansible_distribution == "Debian"
+  become: yes
+

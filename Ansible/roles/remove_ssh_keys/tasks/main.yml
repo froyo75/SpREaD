@@ -1,0 +1,11 @@
+---
+# tasks file for roles/remove_ssh_keys
+
+- name: Remove authorized keys
+  authorized_key:
+    user: "{{ ansible_user }}"
+    state: absent
+    key: "{{ lookup('file', item) }}"
+    key_options: "{{ authorized_key_options }}"
+  with_fileglob:
+    - "{{ ssh_quarantine_keys_folder }}/*.pub"

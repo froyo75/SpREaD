@@ -1,0 +1,14 @@
+---
+# tasks file for install_redirect_rules
+
+- name: Install redirect rules to the remote host
+  copy:
+    src: "redirect_rules/{{ service_type }}/{{ server_domain }}/redirect.rules"
+    dest: /etc/apache2/
+  become: yes
+
+- name: Restart Apache2 service
+  service:
+    name: apache2
+    state: restarted
+  become: yes

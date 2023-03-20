@@ -1,0 +1,5 @@
+# Remove SSH Access
+- hosts: all
+  gather_facts: true
+  roles:
+    - remove_ssh_keys

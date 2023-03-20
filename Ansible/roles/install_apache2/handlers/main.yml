@@ -1,0 +1,14 @@
+---
+# handlers file for install_apache2_reverse_proxy
+
+- name: Reload Apache2 service
+  service:
+    name: apache2
+    state: reloaded
+  become: yes
+
+- name: Restart Apache2 service
+  service:
+    name: apache2
+    state: restarted
+  become: yes

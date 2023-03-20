@@ -1,0 +1,14 @@
+---
+# handlers file for install_nginx_reverse_proxy
+
+- name: Reload NGINX service
+  service:
+    name: nginx
+    state: reloaded
+  become: yes
+
+- name: Restart NGINX service
+  service:
+    name: nginx
+    state: restarted
+  become: yes

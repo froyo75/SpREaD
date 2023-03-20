@@ -1,0 +1,15 @@
+# Install & Configure a new Mailu instance
+- hosts: mailu
+  gather_facts: true
+  vars:
+   virtual_host_template: default-https.j2
+   web_service: apache2
+   docker_app : mailu
+   docker_startup_script: startMailu.sh
+  roles:
+    - configure_letsencrypt
+    - install_apache2
+    - install_clonesite
+    - install_docker
+    - setup_docker_container
+    - configure_mailu

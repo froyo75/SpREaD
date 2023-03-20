@@ -1,0 +1,12 @@
+---
+# tasks file for roles/install_kernel_headers
+
+- name: Install kernel-headers in Debian (using apt tool)
+  ignore_errors: yes
+  apt:
+    update_cache: yes
+    pkg: "linux-headers-{{ ansible_kernel }}"
+    state: present
+  when:
+   - ansible_pkg_mgr == "apt" and ansible_lsb.id == "Debian"
+  become: yes

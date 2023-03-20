@@ -1,0 +1,30 @@
+Port {{ sshd_port }}
+AddressFamily inet
+ListenAddress 0.0.0.0
+#ListenAddress {{ ansible_default_ipv4.address }}
+HostKey /etc/ssh/ssh_host_ed25519_key
+#HostKey /etc/ssh/ssh_host_rsa_key
+Protocol 2
+AllowUsers {{ ansible_user }}
+IgnoreRhosts yes
+PermitRootLogin yes
+PasswordAuthentication no
+ChallengeResponseAuthentication no
+PermitEmptyPasswords no
+PubkeyAuthentication yes
+AuthorizedKeysFile .ssh/authorized_keys
+UsePAM yes
+Banner none
+PrintMotd no
+#AllowTcpForwarding no
+AllowStreamLocalForwarding no
+GatewayPorts no
+PermitTunnel no
+ClientAliveInterval 300
+ClientAliveCountMax 2
+MaxAuthTries 3
+X11Forwarding no
+KexAlgorithms curve25519-sha256@libssh.org
+Ciphers chacha20-poly1305@openssh.com,aes256-gcm@openssh.com,aes128-gcm@openssh.com,aes256-ctr,aes192-ctr,aes128-ctr
+MACs hmac-sha2-512-etm@openssh.com,hmac-sha2-256-etm@openssh.com,umac-128-etm@openssh.com
+#Subsystem sftp /usr/lib/openssh/sftp-server

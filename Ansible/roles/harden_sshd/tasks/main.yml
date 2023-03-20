@@ -1,0 +1,29 @@
+---
+# tasks file for harden_sshd
+
+- name: Set authorized key
+  authorized_key:
+    user: "{{ ansible_user }}"
+    state: present
+    key: "{{ lookup('file', item) }}"
+    key_options: "{{ authorized_key_options }}"
+  with_fileglob:
+    - "{{ ssh_authorized_keys_folder }}/*.pub"
+
+- name: Hardening SSHD config
+  template:
+    src: sshd_config.j2
+    dest: /etc/ssh/sshd_config
+  become: yes
+
+- name: Restart SSHD service
+  service:
+     name: ssh
+     state: restarted
+  become: yes
+
+- name: Enable SSHD service
+  service:
+    name: ssh
+    enabled: yes
+  become: yes

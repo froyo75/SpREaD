@@ -1,0 +1,68 @@
+---
+# tasks file for install_apache2_reverse_proxy
+
+- name: Install Apache2 service (using apt tool)
+  apt:
+    update_cache: yes
+    pkg: apache2
+    state: present
+  when:
+   - ansible_pkg_mgr == "apt"
+  become: yes
+
+- name: Configure Apache2 service
+  copy: src={{ item.src }} dest={{ item.dest }}
+  with_items:
+    - { src: "{{ role_path }}/files/apache2.conf", dest: '/etc/apache2/' }
+    - { src: "{{ role_path }}/files/options-ssl-apache.conf", dest: '/etc/apache2/' }
+    - { src: '{{ role_path }}/files/index.html', dest: '/var/www/html/' }
+  become: yes
+  
+- name: Configure the virtual host
+  template:
+    src: "{{ item.src }}"
+    dest: "/etc/apache2/sites-available/{{ item.dest }}"
+  loop:
+    - { src: "{{ role_path }}/templates/default-http.j2", dest: '000-default.conf' }
+    - { src: "{{ role_path }}/templates/{{ virtual_host_template }}", dest: 'default-ssl.conf' }
+  become: yes
+
+- name: Enable the virtual host
+  file:
+    src: "/etc/apache2/sites-available/{{ item }}"
+    dest: "/etc/apache2/sites-enabled/{{ item }}"
+    state: link
+  with_items:
+    - 000-default.conf
+    - default-ssl.conf
+  become: yes
+
+- name: Enable Apache2 required modules
+  file:
+    src: "/etc/apache2/mods-available/{{ item }}"
+    dest: "/etc/apache2/mods-enabled/{{ item }}"
+    state: link
+  with_items:
+    - socache_shmcb.load
+    - ssl.load
+    - ssl.conf
+    - proxy.load
+    - proxy.conf
+    - proxy_http.load
+    - rewrite.load
+    - headers.load
+  become: yes
+ 
+- name: Enable Apache2 service
+  service:
+    name: apache2
+    enabled: yes
+  become: yes
+
+- name: Start/Restart Apache2 service
+  service:
+    name: apache2
+    state: restarted
+  become: yes
+  when: not noautostart or noautostart is not defined
+

@@ -1,0 +1,33 @@
+---
+# tasks file for configure_dns
+
+- name: Populate service facts
+  service_facts:
+
+- name: Stop NetworkManager from updating 'resolv.conf'
+  ini_file:
+    path: /etc/NetworkManager/NetworkManager.conf
+    state: present
+    no_extra_spaces: yes
+    section: main
+    option: dns
+    value: none
+    owner: root
+    group: root
+    mode: 0644
+    backup: yes
+  when:
+   - ansible_facts.services["network-manager.service"] is defined
+  notify:
+    - Reload NetworkManager service
+  become: yes
+
+- name: Configure 'resolv.conf'
+  template:
+    src: resolv.conf.j2
+    dest: /etc/resolv.conf
+    owner: root
+    group: root
+    mode: 0644
+    #backup: yes
+  become: yes

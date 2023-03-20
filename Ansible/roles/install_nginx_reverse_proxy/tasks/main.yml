@@ -1,0 +1,60 @@
+---
+# tasks file for install_nginx_reverse_proxy
+
+- name: Install NGINX service (using apt tool)
+  apt:
+    update_cache: yes
+    pkg: nginx
+    state: present
+  when:
+   - ansible_pkg_mgr == "apt"
+  become: yes
+
+- name: Configure NGINX service
+  template:
+    src: nginx.conf.j2
+    dest: /etc/nginx/nginx.conf
+  become: yes
+
+- name: Configure the virtual host
+  template:
+    src: "{{ nginx_virtual_host }}"
+    dest: /etc/nginx/sites-available/default
+  become: yes
+
+- name: Enable the virtual host
+  file:
+    src: /etc/nginx/sites-available/default
+    dest: /etc/nginx/sites-enabled/default
+    state: link
+
+- name: Generate a stronger DHE parameter
+  copy:
+    src: "certs/{{ server_domain }}/dhparam.pem"
+    dest: /etc/ssl/certs/
+    mode: '0644'
+    owner: root
+  become: yes
+
+- name: Install SSL certificates
+  copy:
+    src: "{{ item.src }}"
+    dest: "{{ item.dest }}"
+    mode: "{{ item.mode }}"
+    owner: root
+  loop:
+    - { src: 'certs/{{ server_domain }}/{{ server_domain }}.key', dest: '/etc/ssl/private/', mode: '0600'}
+    - { src: 'certs/{{ server_domain }}/{{ server_domain }}.crt', dest: '/etc/ssl/certs/', mode: '0644'}
+  become: yes
+
+- name: Enable NGINX service
+  service:
+    name: nginx
+    enabled: yes
+  become: yes
+
+- name: Start/Restart NGINX service
+  service:
+    name: nginx
+    state: restarted
+  become: yes

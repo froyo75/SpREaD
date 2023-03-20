@@ -1,0 +1,13 @@
+galaxy_info:
+  author: froyo75
+  description: Harden SSH Service
+  company: froyo75
+  license: MIT
+
+  min_ansible_version: 2.4
+
+  galaxy_tags:
+    - ssh
+    - system
+
+dependencies: []

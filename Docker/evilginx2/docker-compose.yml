@@ -1,0 +1,22 @@
+version: '3.8'
+
+services:
+  evilginx2:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: evilginx2
+    ports:
+      - 80:80/tcp
+      - 443:443/tcp
+      - 53:53/udp
+    command: ["/bin/bash"]
+    #command: ["/bin/evilginx", "-p", "/app/phishlets", "-debug", "-developer"]
+    volumes:
+      - /etc/timezone:/etc/timezone:ro
+      - /etc/localtime:/etc/localtime:ro
+      - ./app/:/root/.evilginx
+      - ./app/phishlets:/app/phishlets
+    stdin_open: true
+    tty: true
+    restart: unless-stopped

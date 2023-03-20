@@ -1,0 +1,11 @@
+# Install & Configure a C2Proxy
+- hosts: c2proxy
+  gather_facts: true
+  vars:
+   virtual_host_template: c2proxy-https.j2
+   web_service: apache2
+   noautostart: true
+  roles:
+    - configure_letsencrypt
+    - install_apache2
+    - install_redirect_rules

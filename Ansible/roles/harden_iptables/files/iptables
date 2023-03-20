@@ -1,0 +1,12 @@
+/var/log/iptables.log {
+	daily
+	missingok
+	rotate 5
+	compress
+	delaycompress
+	notifempty
+	create 600 root root
+	postrotate
+		/usr/lib/rsyslog/rsyslog-rotate
+	endscript
+}

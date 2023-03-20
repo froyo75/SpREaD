@@ -1,0 +1,78 @@
+---
+# tasks file for harden_iptables
+
+- name: Configure rsyslog service
+  copy:
+    src: iptables.conf
+    dest: /etc/rsyslog.d/iptables.conf
+    mode: '0600'
+    owner: root
+  become: yes
+
+- name: Restart rsyslog service
+  service:
+    name: rsyslog
+    state: restarted
+  become: yes
+
+- name: Configure logrotate service
+  copy:
+    src: iptables
+    dest: /etc/logrotate.d/iptables
+    mode: '0644'
+    owner: root
+  become: yes
+
+- name: Install "iptables-persistent" package (using apt tool)
+  apt:
+    update_cache: yes
+    pkg: iptables-persistent
+    state: present
+  when:
+   - ansible_pkg_mgr == "apt"
+  become: yes
+
+- name: iptables flush filter
+  iptables:
+    chain: "{{ item }}"
+    flush: yes
+  with_items:  [ 'INPUT', 'FORWARD', 'OUTPUT' ]
+  become: yes
+
+- name: iptables flush nat
+  iptables:
+    table: nat
+    chain: '{{ item }}'
+    flush: yes
+  with_items: [ 'INPUT', 'OUTPUT', 'PREROUTING', 'POSTROUTING' ]
+  become: yes
+
+- name: iptables flush mangle
+  iptables:
+    table: mangle
+    chain: '{{ item }}'
+    flush: yes
+  with_items: [ 'INPUT', 'OUTPUT', 'PREROUTING', 'FORWARD', 'POSTROUTING' ]
+  become: yes
+
+- name: Check if rules path exists
+  local_action: stat path="iptables/{{ service_type }}/{{ inventory_hostname }}/rules.v4"
+  register: rules_file
+
+- name: Set rules path variable
+  set_fact: 
+    rules_path: "{% if not rules_file.stat.exists %}iptables/{{ service_type }}/rules.v4{% else %}iptables/{{ service_type }}/{{ inventory_hostname }}/rules.v4{% endif %}"
+
+- name: Configure iptables rules
+  copy:
+    src: "{{ rules_path }}"
+    dest: /etc/iptables/rules.v4
+    mode: '0600'
+    owner: root
+  become: yes
+
+- name: Load iptables rules
+  shell: iptables-restore < /etc/iptables/rules.v4
+  args:
+    executable: /bin/bash
+  become: yes

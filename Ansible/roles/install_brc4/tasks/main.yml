@@ -1,0 +1,84 @@
+---
+# tasks file for install_brc4
+
+- name: Install BRC4 required packages (using apt tool)
+  apt:
+    update_cache: yes
+    pkg: 
+     - nasm
+     - mingw-w64
+    state: present
+  when:
+   - ansible_pkg_mgr == "apt"
+  become: yes
+
+- name: Create BRC4 folder
+  file:
+    path: /opt/brc4
+    state: directory
+    mode: 0755
+  become: yes
+
+- name: Install BRC4
+  copy:
+    src: "{{ role_path }}/files/"
+    dest: /opt/brc4/
+    mode: preserve
+  become: yes
+
+- name: Configure BRC4
+  copy: src={{ item.src }} dest={{ item.dest }}
+  with_items:
+    - { src: 'brc4/{{ inventory_hostname }}/cert.pem', dest: '/opt/brc4' }
+    - { src: 'brc4/{{ inventory_hostname }}/key.pem', dest: '/opt/brc4/' }
+    - { src: 'brc4/{{ inventory_hostname }}/.brauth', dest: '/opt/brc4/' }
+  become: yes
+
+- name: Copy the new BRC4 server configuration file into place
+  copy:
+    src: "brc4/{{ inventory_hostname }}/c4profile.conf"
+    dest: /opt/brc4/server_confs
+    mode: '0600'
+    owner: root
+  when: c2_mode == "ratel"
+  become: yes
+
+- name: Copy the "brc4.sh" script into place
+  copy:
+    src: "brc4/{{ inventory_hostname }}/brc4-{{ c2_mode }}.sh"
+    dest: /opt/brc4/brc4.sh
+    mode: '0600'
+    owner: root
+  become: yes
+
+- name: Configure BRC4 service
+  template:
+    src: brc4.service.j2
+    dest: /etc/systemd/system/brc4.service
+  when:
+   - ansible_service_mgr == "systemd"
+  become: yes
+
+- name: Enable BRC4 service
+  systemd:
+    name: brc4.service
+    enabled: yes
+    masked: no
+  when:
+   - ansible_service_mgr == "systemd"
+  become: yes
+
+- name: Start/Restart BRC4 service
+  systemd:
+    name: brc4.service
+    state: restarted
+  when:
+   - ansible_service_mgr == "systemd"
+  become: yes
+
+- name: Reload systemd manager configuration
+  systemd:
+    daemon_reload: yes
+  when:
+   - ansible_service_mgr == "systemd"
+  become: yes

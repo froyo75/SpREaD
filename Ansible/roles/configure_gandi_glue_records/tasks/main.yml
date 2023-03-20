@@ -1,0 +1,113 @@
+---
+# tasks file for configure_gandi_glue_records
+
+- name: Build the list of external nameservers for the given Domain
+  #no_log: true
+  set_fact:
+    external_ns_list: "{{ external_ns_list + [item] }}"
+  with_items:
+    - "{{ external_nameservers }}"
+  vars:
+    external_ns_list: []
+
+- name: Build the list of Gandi's LiveDNS nameservers
+  #no_log: true
+  set_fact:
+    live_ns_list: "{{ live_ns_list + [item] }}"
+  with_items:
+    - "{{ default_live_dns_nameservers }}"
+  vars:
+    live_ns_list: []
+
+- name: Get the list of Gandi glue records for the given Domain
+  uri:
+    url: "https://{{ api_domain }}/{{ api_version }}/{{ api_endpoint }}/domains/{{ server_domain }}/hosts"
+    method: GET
+    return_content: yes
+    validate_certs: true
+    status_code: 200
+    timeout: 180
+    headers:
+      Accept: application/json
+      Authorization: "Apikey {{ dns_api_key }}"
+  register: http_response
+  when: server_domain is defined
+
+- name: Switch to Gandi's LiveDNS for the given Domain
+  uri:
+    url: "https://{{ api_domain }}/{{ api_version }}/{{ api_endpoint }}/domains/{{ server_domain }}/nameservers"
+    method: PUT
+    return_content: yes
+    body: "{{ data }}"
+    validate_certs: true
+    status_code: 202
+    timeout: 180
+    headers:
+      Content-Type: application/json
+      Authorization: "Apikey {{ dns_api_key }}"
+    body_format: json
+  vars:
+    data: '{"nameservers": {{ live_ns_list | to_json }} }'
+  when: (server_domain is defined) and (http_response.json|length > 0)
+
+- name: Prints wait message
+  debug:
+    msg: "Wait for a few seconds until the Gandi nameservers are successfully modified..."
+  
+- name: Sleep for 10 seconds
+  pause: seconds=10
+
+- name: Delete a Gandi glue record for the given Domain
+  ignore_errors: yes
+  uri:
+    url: "https://{{ api_domain }}/{{ api_version }}/{{ api_endpoint }}/domains/{{ server_domain }}/hosts/{{ item }}"
+    method: DELETE
+    return_content: yes
+    validate_certs: true
+    status_code: 202
+    timeout: 180
+    headers:
+      Accept: application/json
+      Authorization: "Apikey {{ dns_api_key }}"
+  with_items: "{{ external_nameservers }}"
+  when: (server_domain is defined) and (http_response.json|length > 0)
+
+- name: Configure a new Gandi glue record for the given Domain
+  uri:
+    url: "https://{{ api_domain }}/{{ api_version }}/{{ api_endpoint }}/domains/{{ server_domain }}/hosts"
+    method: POST
+    return_content: yes
+    body: '{"name":"{{ item }}","ips":["{{ ansible_host }}"]}'
+    validate_certs: true
+    status_code: 202
+    timeout: 180
+    headers:
+      Content-Type: application/json
+      Authorization: "Apikey {{ dns_api_key }}"
+    body_format: json
+  with_items: "{{ external_nameservers }}"
+  when: server_domain is defined
+
+- name: Prints wait message
+  debug:
+    msg: "Wait for a few seconds until the Glue records are successfully added..."
+  
+- name: Sleep for 10 seconds
+  pause: seconds=10
+
+- name: Update Gandi domain nameservers list for the given Domain
+  uri:
+    url: "https://{{ api_domain }}/{{ api_version }}/{{ api_endpoint }}/domains/{{ server_domain }}/nameservers"
+    method: PUT
+    return_content: yes
+    body: "{{ data }}"
+    validate_certs: true
+    status_code: 202
+    timeout: 180
+    headers:
+      Content-Type: application/json
+      Authorization: "Apikey {{ dns_api_key }}"
+    body_format: json
+  vars:
+    data: '{"nameservers": {{ (external_ns_list | product(["." + server_domain]) | map("join")) | to_json }} }'
+  when: server_domain is defined

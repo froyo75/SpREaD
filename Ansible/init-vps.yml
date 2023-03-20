@@ -1,0 +1,11 @@
+# Install & Configure & Harden a new VPS system
+- hosts: all
+  gather_facts: true
+  roles:
+    - change_hostname
+    - configure_timezone
+    - install_kernel_headers
+    - disable_unnecessary_services
+    - configure_dns
+    - harden_sshd
+    - harden_iptables

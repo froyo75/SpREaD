@@ -1,0 +1,22 @@
+---
+# tasks file for disable_unnecessary_services
+
+- include_vars: "os_{{ ansible_distribution }}.yml"
+
+- name: Stop services
+  service:
+    name: "{{ item }}"
+    state: stopped
+  register: output_stop
+  failed_when: "output_stop is failed and ('find' not in output_stop.msg and 'found' not in output_stop.msg)"
+  with_items: "{{ packages }}"
+  become: yes
+
+- name: Disable services
+  service:
+    name: "{{ item }}"
+    enabled: no
+  register: output_disable
+  failed_when: "output_disable is failed and ('find' not in output_disable.msg and 'found' not in output_disable.msg)"
+  with_items: "{{ packages }}"
+  become: yes

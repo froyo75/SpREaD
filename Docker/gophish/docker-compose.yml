@@ -1,0 +1,25 @@
+version: '3.8'
+
+services:
+  gophish:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        - RECIPIENT_PARAMETER=${RECIPIENT_PARAMETER}
+        - TRACK_PARAMETER=${TRACK_PARAMETER}
+    container_name: gophish
+    env_file: gophish.env
+    ports:
+      - 127.0.0.1:3333:3333/tcp
+      - 127.0.0.1:8888:8080/tcp
+    #command: ["/bin/bash"]
+    command: ["./run.sh"]
+    volumes:
+      - /etc/timezone:/etc/timezone:ro
+      - /etc/localtime:/etc/localtime:ro
+      - ./app/log:/app/log
+      - ./app/data:/app/data
+    stdin_open: true
+    tty: true
+    restart: unless-stopped

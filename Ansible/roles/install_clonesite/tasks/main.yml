@@ -1,0 +1,11 @@
+---
+# tasks file for install_clonesite
+
+- name: Copy site files to the remote host
+  copy:
+    src: "clonesite/{{ server_domain }}/"
+    dest: /var/www/html/
+    mode: 0644
+    owner: www-data
+    group: www-data
+  become: yes

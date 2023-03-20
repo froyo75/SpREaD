@@ -1,0 +1,4 @@
+---
+# vars file for roles/remove_ssh_keys
+
+ssh_quarantine_keys_folder: ./ssh/quarantine

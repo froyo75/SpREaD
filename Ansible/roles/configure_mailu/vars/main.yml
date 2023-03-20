@@ -1,0 +1,9 @@
+---
+# vars file for roles/configure_mailu
+
+default_cname_record: mail
+default_secret_key: 6LV6K2DIQW6W4K55
+default_admin_account: admin
+default_admin_pwd: Zs9208Er21deP@#sd
+default_dmarc_rua: support
+default_dmarc_ruf: support

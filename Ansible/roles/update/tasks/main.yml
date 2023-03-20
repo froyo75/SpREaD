@@ -1,0 +1,19 @@
+---
+# tasks file for update
+
+- name: Update & upgrade system (using apt tool)
+  apt: 
+    update_cache: yes
+    upgrade: dist
+  when:
+   - ansible_pkg_mgr == "apt"
+  become: yes
+
+- name: Check if a reboot is required
+  register: file
+  stat: path=/var/run/reboot-required get_md5=no
+
+- name: Reboot if a reboot is required
+  command: /sbin/reboot
+  when: file.stat.exists == true 
+  become: yes

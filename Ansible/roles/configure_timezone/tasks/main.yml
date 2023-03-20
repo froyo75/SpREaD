@@ -1,0 +1,7 @@
+---
+# tasks file for configure_timezone
+
+- name: Set TimeZone
+  community.general.timezone:
+    name: "{{ timezone }}"
+  become: yes

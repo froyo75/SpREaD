@@ -1,0 +1,5 @@
+# Install & Configure BRC4
+- hosts: c2server
+  gather_facts: true
+  roles:
+    - install_brc4

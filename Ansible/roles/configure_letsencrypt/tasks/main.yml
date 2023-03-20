@@ -1,0 +1,45 @@
+---
+# tasks file for configure_letsencrypt
+
+- name: Install certbot package (using apt tool)
+  apt:
+    update_cache: yes
+    pkg: certbot
+    state: present
+  when:
+   - ansible_pkg_mgr == "apt"
+  become: yes
+
+- name: Stop Web service, if started
+  service:
+    name: "{{ web_service }}"
+    state: stopped
+  when:
+   - ansible_facts.services[web_service + ".service"] is defined
+  become: yes
+
+- name: Generate Let's Encrypt Certificate using certbot
+  shell: "certbot certonly --standalone -d {{ server_domain }} --email {{ admin_email_address }} --agree-tos -n"
+  when:
+   - ansible_distribution == "Debian"
+  register: certbot
+  become: yes
+
+- name: Configure hooks to automatically renew the certificate
+  replace:
+    path: /usr/lib/systemd/system/certbot.service
+    regexp: '^(ExecStart[=])[^\n]+$'
+    replace: '\g<1>/usr/bin/certbot -q renew --pre-hook "service {{ web_service }} stop" --post-hook "service {{ web_service }} start"'
+  when:
+   - ansible_service_mgr == "systemd" and web_service is defined and (web_service|lower) != "none"
+  become: yes
+
+- debug: var=certbot.stdout_lines
+
+- name: Start Web service, if stopped
+  service:
+    name: "{{ web_service }}"
+    state: started
+  when:
+   - ansible_facts.services[web_service + ".service"] is defined
+  become: yes

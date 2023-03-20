@@ -1,0 +1,6 @@
+---
+# vars file for configure_gandi_dns_records
+
+api_domain: api.gandi.net
+api_version: v5
+api_endpoint: livedns

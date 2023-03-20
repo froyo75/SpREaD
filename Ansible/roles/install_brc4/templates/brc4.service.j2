@@ -1,0 +1,12 @@
+[Unit]
+Description=BRC4 Service
+
+[Service]
+Type=simple
+WorkingDirectory=/opt/brc4
+ExecStart=/bin/bash /opt/brc4/brc4.sh
+User={{ ansible_user }}
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target
