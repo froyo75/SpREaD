@@ -28,7 +28,7 @@ git clone https://github.com/
 ```
 
 ### 3. Setup a new infrastructure
-See the project's [wiki](https://github.com/froyo75/wiki) for more details.
+See the project's [wiki](https://github.com/froyo75/SpREaD/wiki) for more details.
 
 ## Usage
 **Deploy a new infra**
