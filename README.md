@@ -1,6 +1,6 @@
 # SpREaD
 
-![SpREaD](images/eagle.png)
+<img src="images/eagle.png" width="300px">
 
 ## Installation
 
