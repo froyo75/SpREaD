@@ -1,0 +1,69 @@
+---
+# tasks file for install_axiom
+
+- name: Install the required packages (using apt tool)
+  apt:
+    update_cache: yes
+    pkg: 
+    - git
+    - ca-certificates
+    state: present
+  when:
+   - ansible_pkg_mgr == "apt"
+  become: yes
+
+- name: Check if config path exists
+  local_action: stat path="axiom/{{ inventory_hostname }}/axiom.json"
+  register: config_path
+
+- name: Set config path variable
+  set_fact: 
+    config_path: "{% if not config_path.stat.exists %}axiom/default.json{% else %}axiom/{{ inventory_hostname }}/axiom.json{% endif %}"
+
+- name: Copy the Axiom config file to the remote host
+  copy:
+    src: "{{ config_path }}"
+    dest: ~/
+
+- name: Setup and configure the axiom controller
+  shell: git clone https://github.com/pry0cc/axiom ~/.axiom/ && ~/.axiom/interact/axiom-configure --shell Zsh --unattended --config "$(cat ~/axiom.json | tr '\n' ' ' | tr -s ' ')" && ~/.axiom/interact/axiom-build {{ axiom_provisioner }}
+  when:
+   - ansible_distribution == "Debian"
+  register: setup
+
+- debug: var=setup.stdout_lines
+
+- name: Set Zsh as the default shell for root user
+  user:
+    name: "{{ ansible_user }}"
+    shell: /bin/zsh
+  become: yes
+
+- name: Remove the Axiom config file from the remote host
+  file:
+    path: "~/axiom.json"
+    state: absent
+
+- name: Copy the Axiom scripts to the remote host
+  synchronize:
+      src: "{{ role_path }}/files/"
+      dest: "~/"
+      mode: push
+      recursive: yes
+      rsync_opts:
+        - "--no-motd"
+        - "--exclude=modules"
+
+- name: Copy the Axiom modules to the remote host
+  copy:
+    src: "{{ role_path }}/files/modules/"
+    dest: ~/.axiom/modules
+
+- name: Extract provider value from config file
+  shell: grep -w "provider" "{{ config_path }}" | awk -F ':' '{print $2}' | tr -d '",  \n'
+  delegate_to: localhost
+  register: provider_value
+
+- name: Fix AWS Axiom account setup if AWS provider is used
+  shell: ~/fix_aws_axiom_account_setup.sh
+  when: provider_value.stdout == "aws"

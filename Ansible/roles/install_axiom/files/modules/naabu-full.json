@@ -1,0 +1,4 @@
+[{
+	"command":"[ ! -s input ] && exit 1; cat input | sudo /home/op/go/bin/naabu -ec -iv 4 -Pn -s c -rate 10000 -tp full -o output",
+	"ext":"txt"
+}]

@@ -1,0 +1,6 @@
+# Install & Configure a new Axiom controller
+- hosts: axiom
+  gather_facts: true
+  roles:
+    - install_axiom
+

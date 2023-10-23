@@ -1,0 +1,4 @@
+[{
+    "command":"docker run --rm --mount type=bind,source=\"$(pwd)\",target=/data  leonjza/gowitness gowitness file -f /data/input -P /data/output",
+    "ext":""
+}]

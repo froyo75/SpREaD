@@ -1,0 +1,4 @@
+[{
+	"command":"cat input | /home/op/go/bin/gau --subs --blacklist png,jpg,jpeg,gif,gif,svg,tiff,psd,css --threads 5 --fc 404,302 --retries 2 --o output",
+	"ext":"txt"
+}]
