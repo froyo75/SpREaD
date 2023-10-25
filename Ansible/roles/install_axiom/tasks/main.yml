@@ -20,18 +20,42 @@
   set_fact: 
     config_path: "{% if not config_path.stat.exists %}axiom/default.json{% else %}axiom/{{ inventory_hostname }}/axiom.json{% endif %}"
 
+- name: Clone Axiom repository
+  shell: git clone https://github.com/pry0cc/axiom ~/.axiom/
+  when:
+   - ansible_distribution == "Debian"
+  register: git
+
+- debug: var=git.stdout_lines
+
+- name: Fix the Axiom configuration wizard
+  shell: sed -i 's/openssh-server //' ~/.axiom/interact/axiom-configure
+  when:
+   - ansible_distribution == "Debian"
+  register: fix
+
+- debug: var=fix.stdout_lines
+
 - name: Copy the Axiom config file to the remote host
   copy:
     src: "{{ config_path }}"
     dest: ~/
 
 - name: Setup and configure the axiom controller
-  shell: git clone https://github.com/pry0cc/axiom ~/.axiom/ && ~/.axiom/interact/axiom-configure --shell Zsh --unattended --config "$(cat ~/axiom.json | tr '\n' ' ' | tr -s ' ')" && ~/.axiom/interact/axiom-build {{ axiom_provisioner }}
+  shell: ~/.axiom/interact/axiom-configure --shell Zsh --unattended --config "$(cat ~/axiom.json | tr '\n' ' ' | tr -s ' ')"
   when:
    - ansible_distribution == "Debian"
   register: setup
 
 - debug: var=setup.stdout_lines
+
+- name: Building a new axiom image
+  shell: ~/.axiom/interact/axiom-build {{ axiom_provisioner }}
+  when:
+   - ansible_distribution == "Debian"
+  register: build
+
+- debug: var=build.stdout_lines
 
 - name: Set Zsh as the default shell for root user
   user:
@@ -64,6 +88,6 @@
   delegate_to: localhost
   register: provider_value
 
-- name: Fix AWS Axiom account setup if AWS provider is used
+- name: Fix AWS Axiom account setup
   shell: ~/fix_aws_axiom_account_setup.sh
   when: provider_value.stdout == "aws"
