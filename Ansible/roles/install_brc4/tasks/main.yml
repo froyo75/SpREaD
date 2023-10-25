@@ -17,6 +17,7 @@
     path: /opt/brc4
     state: directory
     mode: 0755
+    owner: "{{ ansible_user }}"
   become: yes
 
 - name: Install BRC4
@@ -39,7 +40,6 @@
     src: "brc4/{{ inventory_hostname }}/c4profile.conf"
     dest: /opt/brc4/server_confs
     mode: '0600'
-    owner: root
   when: c2_mode == "ratel"
   become: yes
 
@@ -48,7 +48,6 @@
     src: "brc4/{{ inventory_hostname }}/brc4-{{ c2_mode }}.sh"
     dest: /opt/brc4/brc4.sh
     mode: '0600'
-    owner: root
   become: yes
 
 - name: Configure BRC4 service

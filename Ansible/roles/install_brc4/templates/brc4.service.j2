@@ -5,7 +5,7 @@ Description=BRC4 Service
 Type=simple
 WorkingDirectory=/opt/brc4
 ExecStart=/bin/bash /opt/brc4/brc4.sh
-User={{ ansible_user }}
+User=root
 Restart=on-failure
 
 [Install]
