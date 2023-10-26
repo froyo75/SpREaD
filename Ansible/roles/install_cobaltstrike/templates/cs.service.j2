@@ -1,0 +1,12 @@
+[Unit]
+Description=Cobalt Strike Service
+
+[Service]
+Type=simple
+WorkingDirectory=/opt/cs/cobaltstrike
+ExecStart=/bin/bash cs.sh
+User=root
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target

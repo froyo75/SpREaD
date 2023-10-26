@@ -21,6 +21,7 @@ hosts = {
     vps_smtp_dkim_domain_key       = ""
     vps_smtp_dkim_selector         = ""
     vps_c2_mode                    = ""
+    vps_c2_framework               = ""
   },
   "rtX-c2proxy-tata-com" = {
     do_name                        = "tata.com"
@@ -42,5 +43,6 @@ hosts = {
     vps_smtp_dkim_domain_key       = ""
     vps_smtp_dkim_selector         = ""
     vps_c2_mode                    = ""
+    vps_c2_framework               = ""
   }
 }

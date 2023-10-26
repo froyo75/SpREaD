@@ -55,6 +55,7 @@ variable "hosts" {
     vps_smtp_dkim_domain_key       = string
     vps_smtp_dkim_selector         = string
     vps_c2_mode                    = string
+    vps_c2_framework               = string
   }))
   default = {
     "test" = {
@@ -77,6 +78,7 @@ variable "hosts" {
       vps_smtp_dkim_domain_key       = ""
       vps_smtp_dkim_selector         = ""
       vps_c2_mode                    = ""
+      vps_c2_framework               = ""
     }
   }
 }

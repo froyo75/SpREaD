@@ -1,0 +1,79 @@
+---
+# tasks file for roles/install_cobaltstrike
+
+- name: Install Cobalt Strike required packages (using apt tool)
+  apt:
+    update_cache: yes
+    pkg: 
+     - unzip
+     - openjdk-11-jdk
+    state: present
+  when:
+   - ansible_pkg_mgr == "apt"
+  become: yes
+
+- name: Create Cobalt Strike folder
+  file:
+    path: /opt/cs
+    state: directory
+    mode: 0755
+  become: yes
+
+- name: Copy the Cobalt Strike archive file
+  copy:
+    src: "{{ role_path }}/files/cs.zip"
+    dest: /opt/cs/cs.zip
+    mode: '0600'
+  become: yes
+
+- name: Unzip the Cobalt Strike archive
+  unarchive:
+    src: /opt/cs/cs.zip
+    dest: /opt/cs
+    remote_src: yes
+  become: yes
+
+- name: Remove the Cobalt Strike archive from the remote host
+  file:
+    path: /opt/cs/cs.zip
+    state: absent
+  become: yes
+
+- name: Copy the "cs.sh" script into place
+  copy:
+    src: "cobaltstrike/{{ inventory_hostname }}/cs.sh"
+    dest: /opt/cs/cobaltstrike/cs.sh
+    mode: '0700'
+  become: yes
+
+- name: Configure Cobalt Strike service
+  template:
+    src: cs.service.j2
+    dest: /etc/systemd/system/cs.service
+  when:
+   - ansible_service_mgr == "systemd"
+  become: yes
+
+- name: Enable Cobalt Strike service
+  systemd:
+    name: cs.service
+    enabled: yes
+    masked: no
+  when:
+   - ansible_service_mgr == "systemd"
+  become: yes
+
+- name: Start/Restart Cobalt Strike service
+  systemd:
+    name: cs.service
+    state: restarted
+  when:
+   - ansible_service_mgr == "systemd"
+  become: yes
+
+- name: Reload systemd manager configuration
+  systemd:
+    daemon_reload: yes
+  when:
+   - ansible_service_mgr == "systemd"
+  become: yes

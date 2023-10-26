@@ -55,6 +55,7 @@ resource "aws_instance" "instance" {
       sed -i -e 's!^\(dns_template:\)\(.*\)!\1 ${each.value.vps_dns_template}!g' $HOST_VARS_FILE_PATH
       sed -i -e 's!^\(dkim_domain_key:\)\(.*\)!\1 ${each.value.vps_smtp_dkim_domain_key}!g' $HOST_VARS_FILE_PATH
       sed -i -e 's!^\(dkim_selector:\)\(.*\)!\1 ${each.value.vps_smtp_dkim_selector}!g' $HOST_VARS_FILE_PATH
+      sed -i -e 's!^\(c2_framework:\)\(.*\)!\1 ${each.value.vps_c2_framework}!g' $HOST_VARS_FILE_PATH
       sed -i -e 's!^\(c2_mode:\)\(.*\)!\1 ${each.value.vps_c2_mode}!g' $HOST_VARS_FILE_PATH
 
       sleep $SSH_DELAY
@@ -72,7 +73,7 @@ resource "aws_instance" "instance" {
       fi
 
       if [[ ! -z $VPS_SERVICE_TYPE && -f $ANSIBLE_PLAYBOOK_SERVICE ]];then
-        ansible-playbook -i $INVENTORY_PATH --limit ${each.key} $ANSIBLE_PLAYBOOK_SERVICE
+        ansible-playbook -i $INVENTORY_PATH -e c2_framework=${each.value.vps_c2_framework} --limit ${each.key} $ANSIBLE_PLAYBOOK_SERVICE
       fi
     EOT
   }
