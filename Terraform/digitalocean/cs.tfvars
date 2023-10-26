@@ -1,12 +1,11 @@
 op_name = "rtX"
-aws_region = "paris"
 
 hosts = {
   "rtX-c2server-cs" = {
-    aws_name                       = "c2server-cs"
-    aws_image                      = "ami-05bfef86a955a699e"
-    aws_type                       = "t3.micro"
-    aws_environment                = "PROD"
+    do_name                        = "c2server-cs"
+    do_image                       = "debian-10-x64"
+    do_size                        = "s-2vcpu-4gb-intel"
+    do_region                      = "ams3"
     ansible_user                   = "root"
     ansible_port                   = 22
     vps_ssh_authorized_keys_folder = "./ssh/rtops"
@@ -14,7 +13,7 @@ hosts = {
     vps_domain                     = ""
     vps_sshd_port                  = 2222
     vps_admin_email_address        = "rtops@example.com"
-    vps_timezone                   = "Europe/Paris"
+    vps_timezone                   = "Europe/Amsterdam"
     vps_service_type               = "c2server"
     vps_dns_provider               = ""
     vps_glue_record		    = false
