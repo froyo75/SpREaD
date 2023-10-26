@@ -2,8 +2,8 @@ op_name = "rtX"
 aws_region = "paris"
 
 hosts = {
-  "rtX-c2-ratel" = {
-    aws_name                       = "c2-ratel"
+  "rtX-c2server-ratel" = {
+    aws_name                       = "c2server-ratel"
     aws_image                      = "ami-05bfef86a955a699e"
     aws_type                       = "t3.micro"
     aws_environment                = "PROD"
@@ -24,8 +24,8 @@ hosts = {
     vps_c2_framework               = "brc4"
     vps_c2_mode                    = "ratel"
   },
-  "rtX-c2-boomerang" = {
-    aws_name                       = "c2-boomerang"
+  "rtX-c2server-boomerang" = {
+    aws_name                       = "c2server-boomerang"
     aws_image                      = "ami-05bfef86a955a699e"
     aws_type                       = "t3.micro"
     aws_environment                = "PROD"

@@ -23,7 +23,7 @@ hosts = {
     vps_c2_mode                    = ""
     vps_c2_framework               = ""
   },
-  "rtX-recon-axiom" = {
+  "rtX-axiom" = {
     do_name                        = "recon-axiom"
     do_image                       = "debian-10-x64"
     do_size                        = "s-1vcpu-2gb-intel"

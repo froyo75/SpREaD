@@ -2,8 +2,8 @@ op_name = "rtX"
 aws_region = "paris"
 
 hosts = {
-  "rtX-c2-cs" = {
-    aws_name                       = "c2-cs"
+  "rtX-c2server-cs" = {
+    aws_name                       = "c2server-cs"
     aws_image                      = "ami-05bfef86a955a699e"
     aws_type                       = "t3.micro"
     aws_environment                = "PROD"
