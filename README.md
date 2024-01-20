@@ -24,18 +24,8 @@ brew install ansible
 
 ### 2. Git clone this repo
 ```shell
-git clone https://github.com/
+git clone https://github.com/froyo75/SpREaD.git
 ```
 
 ### 3. Setup a new infrastructure
-See the project's [wiki](https://github.com/froyo75/SpREaD/wiki) for more details.
-
-## Usage
-**Deploy a new infra**
-```shell
-./init-infra.sh <myinfra>.tfvars deploy
-```
-**Destroy the current infra**
-```shell
-./init-infra.sh <myinfra>.tfvars destroy
-```
+See the project's [wiki](https://github.com/froyo75/SpREaD/wiki/Setup-Infrastructure) for more details.
