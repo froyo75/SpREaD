@@ -9,7 +9,7 @@
 ### 1. Install Ansible & Terraform
 
 #### Ansible
-- Linux (https://docs.ansible.com/ansible/latest/installation_guide/intro_installation.html)
+- [Linux](https://docs.ansible.com/ansible/latest/installation_guide/intro_installation.html)
 ```shell
 python3 -m pip install --user ansible
 ```
@@ -19,8 +19,8 @@ brew install ansible
 ```
 
 #### Terraform
-- OSX : https://developer.hashicorp.com/terraform/tutorials/aws-get-started/install-cli
-- Linux: https://learn.hashicorp.com/tutorials/terraform/install-cli
+- OSX : [install-cli](https://learn.hashicorp.com/tutorials/terraform/install-cli)
+- Linux: [install-cli](https://learn.hashicorp.com/tutorials/terraform/install-cli)
 
 ### 2. Git clone this repo
 ```shell
