@@ -2,12 +2,12 @@ op_name = "rtX"
 aws_region = "paris"
 
 hosts = {
-  "rtX-c2server-ratel" = {
-    aws_name                       = "c2server-ratel"
+  "rtX-c2-ratel" = {
+    aws_name                       = "c2-ratel"
     aws_image                      = "ami-05bfef86a955a699e"
-    aws_type                       = "t3.micro"
+    aws_type                       = "t3.medium"
     aws_environment                = "PROD"
-    ansible_user                   = "root"
+    ansible_user                   = "admin"
     ansible_port                   = 22
     vps_ssh_authorized_keys_folder = "./ssh/rtops"
     vps_authorized_key_options     = "from=\"0.0.0.0/0\""
@@ -21,15 +21,17 @@ hosts = {
     vps_dns_template               = ""
     vps_smtp_dkim_domain_key       = ""
     vps_smtp_dkim_selector         = ""
+    vps_cdn_endpoints              = ""
     vps_c2_framework               = "brc4"
     vps_c2_mode                    = "ratel"
+    vps_volume_size                = 35
   },
-  "rtX-c2server-boomerang" = {
-    aws_name                       = "c2server-boomerang"
+  "rtX-c2-boomerang" = {
+    aws_name                       = "c2-boomerang"
     aws_image                      = "ami-05bfef86a955a699e"
-    aws_type                       = "t3.micro"
+    aws_type                       = "t3.medium"
     aws_environment                = "PROD"
-    ansible_user                   = "root"
+    ansible_user                   = "admin"
     ansible_port                   = 22
     vps_ssh_authorized_keys_folder = "./ssh/rtops"
     vps_authorized_key_options     = "from=\"0.0.0.0/0\""
@@ -43,7 +45,9 @@ hosts = {
     vps_dns_template               = ""
     vps_smtp_dkim_domain_key       = ""
     vps_smtp_dkim_selector         = ""
+    vps_cdn_endpoints              = ""
     vps_c2_framework               = "brc4"
     vps_c2_mode                    = "boomerang"
+    vps_volume_size                = 10
   }
 }

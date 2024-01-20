@@ -48,7 +48,3 @@
     name: docker
     enabled: yes
   become: yes
-
-- name: Install Docker Compose
-  shell: pip3 install docker-compose
-  become: yes

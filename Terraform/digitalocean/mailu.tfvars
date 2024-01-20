@@ -20,6 +20,7 @@ hosts = {
     vps_dns_template               = "default-smtp"
     vps_smtp_dkim_domain_key       = "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA3IHsiMSxb9EDgNlYDUlH"
     vps_smtp_dkim_selector         = "dkim"
+    vps_cdn_endpoints              = ""
     vps_c2_mode                    = ""
     vps_c2_framework               = ""
   }

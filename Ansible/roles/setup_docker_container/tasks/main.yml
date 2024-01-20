@@ -4,22 +4,34 @@
 - name: Install required packages (using apt tool)
   apt:
     update_cache: yes
-    pkg: rsync
+    pkg: 
+    - rsync
+    - tmux
+    - screen
+    - dnsutils
     state: present
   when:
    - ansible_pkg_mgr == "apt"
   become: yes
 
+- name: Check if a specific Docker folder is defined for the specified host
+  local_action: stat path="../Docker/{{ inventory_hostname }}"
+  register: docker_folder
+
+- name: Set Docker folder path variable
+  set_fact: 
+    docker_folder_path: "{% if not docker_folder.stat.exists %}../Docker/{{ docker_app }}/{% else %}../Docker/{{ inventory_hostname }}{% endif %}"
+
 - name: Copy Docker files to the remote host
   copy:
-    src: "../Docker/{{ docker_app }}"
-    dest: /opt/
+    src: "{{ docker_folder_path }}"
+    dest: "/opt/{{ docker_app }}"
   become: yes
 
 - name: Synchronize permissions
   synchronize:
     delete: yes
-    src: "../Docker/{{ docker_app }}/"
+    src: "{{ docker_folder_path }}/"
     dest: "/opt/{{ docker_app }}/"
     mode: push
     recursive: yes
@@ -39,3 +51,6 @@
   args:
     executable: /bin/bash
   become: yes
+
+
+

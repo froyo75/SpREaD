@@ -5,9 +5,9 @@ api_domain: api.gandi.net
 api_version: v5
 api_endpoint: domain
 default_live_dns_nameservers: 
-  - ns-63-a.gandi.net
+  - ns-162-a.gandi.net
   - ns-84-b.gandi.net
-  - ns-204-c.gandi.net
+  - ns-59-c.gandi.net
 external_nameservers:
   - ns1
   - ns2

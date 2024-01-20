@@ -3,7 +3,7 @@
 
 - name: Delete all Gandi DNS records For the Given Domain
   uri:
-    url: "https://{{ api_domain }}/{{ api_version }}/{{ api_endpoint }}/domains/{{ server_domain }}/records"
+    url: "https://{{ api_domain }}/{{ api_version }}/{{ api_endpoint_livedns }}/domains/{{ server_domain }}/records"
     method: DELETE
     return_content: yes
     validate_certs: true
@@ -14,12 +14,16 @@
       Authorization: "Apikey {{ dns_api_key }}"
   when: server_domain is defined
 
-- name: Configure a Gandi DNS Records For the Given Domain
+- name: Set DNS template variable
+  set_fact:
+    template: "{{ dns_template | default('default-a', true) }}"
+
+- name: Configure Gandi DNS Records For the Given Domain
   uri:
-    url: "https://{{ api_domain }}/{{ api_version }}/{{ api_endpoint }}/domains/{{ server_domain }}/records"
+    url: "https://{{ api_domain }}/{{ api_version }}/{{ api_endpoint_livedns }}/domains/{{ server_domain }}/records"
     method: PUT
     return_content: yes
-    body: "{{ lookup('template', dns_template + '.j2') }}"
+    body: "{{ lookup('template', template + '.j2') }}"
     validate_certs: true
     status_code: 201
     timeout: 180
@@ -27,4 +31,4 @@
       Content-Type: application/json
       Authorization: "Apikey {{ dns_api_key }}"
     body_format: json
-  when: server_domain is defined
+  when: server_domain is defined and template is defined

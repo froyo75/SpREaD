@@ -54,6 +54,7 @@ resource "digitalocean_droplet" "instance" {
       sed -i -e 's!^\(dns_template:\)\(.*\)!\1 ${each.value.vps_dns_template}!g' $HOST_VARS_FILE_PATH
       sed -i -e 's!^\(dkim_domain_key:\)\(.*\)!\1 ${each.value.vps_smtp_dkim_domain_key}!g' $HOST_VARS_FILE_PATH
       sed -i -e 's!^\(dkim_selector:\)\(.*\)!\1 ${each.value.vps_smtp_dkim_selector}!g' $HOST_VARS_FILE_PATH
+      sed -i -e 's!^\(cdn_endpoints:\)\(.*\)!\1 ${each.value.vps_cdn_endpoints}!g' $HOST_VARS_FILE_PATH
       sed -i -e 's!^\(c2_framework:\)\(.*\)!\1 ${each.value.vps_c2_framework}!g' $HOST_VARS_FILE_PATH
       sed -i -e 's!^\(c2_mode:\)\(.*\)!\1 ${each.value.vps_c2_mode}!g' $HOST_VARS_FILE_PATH
 

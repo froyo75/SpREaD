@@ -25,6 +25,11 @@ locals {
         secret_key = var.aws_secret_access_key
         region = "eu-central-1"
     }
+    zurich = {
+        access_key = var.aws_access_key_id
+        secret_key = var.aws_secret_access_key
+        region = "eu-central-2"
+    }
   })
 }
 
@@ -92,8 +97,10 @@ variable "hosts" {
     vps_dns_template               = string
     vps_smtp_dkim_domain_key       = string
     vps_smtp_dkim_selector         = string
+    vps_cdn_endpoints              = string
     vps_c2_mode                    = string
     vps_c2_framework               = string
+    vps_volume_size                = number
   }))
   default = {
     "test" = {
@@ -101,7 +108,7 @@ variable "hosts" {
       aws_image                       = "ami-05bfef86a955a699e"
       aws_type                        = "t3.micro"
       aws_environment                = "DEV"
-      ansible_user                   = "root"
+      ansible_user                   = "admin"
       ansible_port                   = 22
       vps_ssh_authorized_keys_folder = "./ssh/rtops"
       vps_authorized_key_options     = "no-port-forwarding,no-X11-forwarding,no-agent-forwarding,no-user-rc,from=\"0.0.0.0/0\""
@@ -111,12 +118,14 @@ variable "hosts" {
       vps_timezone                   = "Europe/Paris"
       vps_service_type               = "recon"
       vps_dns_provider               = ""
-	  vps_glue_record				 = false
+	    vps_glue_record				         = false
       vps_dns_template               = ""
       vps_smtp_dkim_domain_key       = ""
       vps_smtp_dkim_selector         = ""
+      vps_cdn_endpoints              = ""
       vps_c2_mode                    = ""
       vps_c2_framework               = ""
+      vps_volume_size                = -1
     }
   }
 }

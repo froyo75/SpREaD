@@ -54,6 +54,7 @@ variable "hosts" {
     vps_dns_template               = string
     vps_smtp_dkim_domain_key       = string
     vps_smtp_dkim_selector         = string
+    vps_cdn_endpoints              = string
     vps_c2_mode                    = string
     vps_c2_framework               = string
   }))
@@ -77,6 +78,7 @@ variable "hosts" {
       vps_dns_template               = ""
       vps_smtp_dkim_domain_key       = ""
       vps_smtp_dkim_selector         = ""
+      vps_cdn_endpoints              = ""
       vps_c2_mode                    = ""
       vps_c2_framework               = ""
     }

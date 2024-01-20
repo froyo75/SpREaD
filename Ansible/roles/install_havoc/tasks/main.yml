@@ -1,0 +1,119 @@
+---
+# tasks file for install_havoc
+
+- name: Set up the bookworm repo for Python 3.10 
+  shell: echo 'deb http://ftp.de.debian.org/debian bookworm main' >> /etc/apt/sources.list
+  when:
+   - ansible_distribution == "Debian"
+  become: yes
+
+- name: Install Havoc required packages (using apt tool)
+  apt:
+    update_cache: yes
+    pkg:
+     - git
+     - build-essential
+     - apt-utils
+     - cmake
+     - libfontconfig1
+     - libglu1-mesa-dev
+     - libgtest-dev
+     - libspdlog-dev
+     - libboost-all-dev
+     - libncurses5-dev
+     - libgdbm-dev
+     - libssl-dev
+     - libreadline-dev
+     - libffi-dev
+     - libsqlite3-dev
+     - libbz2-dev
+     - mesa-common-dev
+     - qtbase5-dev
+     - qtchooser
+     - qt5-qmake
+     - qtbase5-dev-tools
+     - libqt5websockets5
+     - libqt5websockets5-dev
+     - qtdeclarative5-dev
+     - qtbase5-dev
+     - libqt5websockets5-dev
+     - python3
+     - libpython3-dev
+     - python3-dev
+     - libboost-all-dev
+     - mingw-w64
+     - nasm
+     - golang-1.18-go
+    state: present
+  when:
+   - ansible_pkg_mgr == "apt"
+  become: yes
+
+- name: Create Havoc folder
+  file:
+    path: /opt/havoc
+    state: directory
+    mode: 0755
+  become: yes
+
+- name: Clone Havoc repository
+  shell: rm -rf /opt/havoc && git clone https://github.com/HavocFramework/Havoc.git /opt/havoc
+  register: git
+  become: yes
+
+- debug: var=git.stdout_lines
+
+- name: Install Havoc
+  shell: ln -fs /usr/lib/go-1.18/bin/go /usr/bin/go && cd /opt/havoc/teamserver && go mod download golang.org/x/sys && go mod download github.com/ugorji/go && cd .. && make ts-build
+  register: build
+  become: yes
+
+- debug: var=build.stdout_lines
+
+- name: Copy the Havoc server profiles into place
+  copy:
+    src: "{{ item }}"
+    dest: /opt/havoc/profiles/
+    mode: 0644
+  with_fileglob:
+    - "havoc/{{ inventory_hostname }}/*.yaotl"
+  become: yes
+
+- name: Copy the "havoc.sh" script into place
+  copy:
+    src: "havoc/{{ inventory_hostname }}/havoc.sh"
+    dest: /opt/havoc/havoc.sh
+    mode: 0700
+  become: yes
+
+- name: Configure Havoc service
+  template:
+    src: havoc.service.j2
+    dest: /etc/systemd/system/havoc.service
+  when:
+   - ansible_service_mgr == "systemd"
+  become: yes
+
+- name: Enable Havoc service
+  systemd:
+    name: havoc.service
+    enabled: yes
+    masked: no
+  when:
+   - ansible_service_mgr == "systemd"
+  become: yes
+
+- name: Start/Restart Havoc service
+  systemd:
+    name: havoc.service
+    state: restarted
+  when:
+   - ansible_service_mgr == "systemd"
+  become: yes
+
+- name: Reload systemd manager configuration
+  systemd:
+    daemon_reload: yes
+  when:
+   - ansible_service_mgr == "systemd"
+  become: yes

@@ -16,7 +16,7 @@ variable "domains" {
         smtp_domain = "test.com"
         smtp_region = "eu"
         spam_action = "disabled"
-        smtp_password = "xxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+        smtp_password = "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
         dkim_key_size = 2048
         dkim_selector = "mx"
     }

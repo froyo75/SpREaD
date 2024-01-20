@@ -1,31 +1,36 @@
 # Create, Install and Configure AWS EC2 using Ansible
 
+/*
 # Get SSH key
 data "aws_key_pair" "current_ssh_key" {
   key_name = var.aws_ssh_key_name
-}
+}*/
 
-/*# Add a new SSH key
+# Add a new SSH key
 resource "aws_key_pair" "default_ssh_key" {
   key_name   = var.aws_ssh_key_name
   public_key = file(var.aws_ssh_public_key)
-}*/
+}
 
 # Create EC2 instance
 resource "aws_instance" "instance" {
   for_each = var.hosts
-  
   ami                    = each.value.aws_image
   instance_type          = each.value.aws_type
   key_name               = var.aws_ssh_key_name
   security_groups        = [each.value.vps_service_type]
   monitoring = true
+
+  root_block_device {
+    volume_size = each.value.vps_volume_size == -1 ? null: each.value.vps_volume_size
+  }
+
   tags = {
     Name = format("%s-%s-%s", var.op_name, each.value.aws_name, each.value.vps_service_type)
     Environment = each.value.aws_environment
   }
 
-  # Configure EC2 instance
+  # Setup and Configure EC2 instance
   provisioner "local-exec" {
     interpreter = ["/bin/bash", "-c"]
     command = <<-EOT
@@ -34,9 +39,6 @@ resource "aws_instance" "instance" {
       INVENTORY_PATH=$ANSIBLE_PATH/${var.op_name}_inventory
       HOSTS_FILE_PATH=$INVENTORY_PATH/hosts.yml
       HOST_VARS_FILE_PATH=$INVENTORY_PATH/host_vars/${each.key}
-      VPS_SERVICE_TYPE=${each.value.vps_service_type}
-      VPS_DNS_PROVIDER=${each.value.vps_dns_provider}
-      ANSIBLE_PLAYBOOK_SERVICE=$ANSIBLE_PATH/init-$VPS_SERVICE_TYPE.yml
       SSH_DELAY=30
       SSH_PRIVATE_KEY_FILE=$(realpath ${var.aws_ssh_private_key})
       mkdir -p $INVENTORY_PATH/{group_vars,host_vars}
@@ -55,6 +57,7 @@ resource "aws_instance" "instance" {
       sed -i -e 's!^\(dns_template:\)\(.*\)!\1 ${each.value.vps_dns_template}!g' $HOST_VARS_FILE_PATH
       sed -i -e 's!^\(dkim_domain_key:\)\(.*\)!\1 ${each.value.vps_smtp_dkim_domain_key}!g' $HOST_VARS_FILE_PATH
       sed -i -e 's!^\(dkim_selector:\)\(.*\)!\1 ${each.value.vps_smtp_dkim_selector}!g' $HOST_VARS_FILE_PATH
+      sed -i -e 's!^\(cdn_endpoints:\)\(.*\)!\1 ${each.value.vps_cdn_endpoints}!g' $HOST_VARS_FILE_PATH
       sed -i -e 's!^\(c2_framework:\)\(.*\)!\1 ${each.value.vps_c2_framework}!g' $HOST_VARS_FILE_PATH
       sed -i -e 's!^\(c2_mode:\)\(.*\)!\1 ${each.value.vps_c2_mode}!g' $HOST_VARS_FILE_PATH
 
@@ -62,19 +65,6 @@ resource "aws_instance" "instance" {
 
       ansible-playbook -i $INVENTORY_PATH --limit ${each.key} $ANSIBLE_PATH/init-vps.yml
       sed -i -e 's!^\(ansible_port:\)\(.*\)!\1 ${each.value.vps_sshd_port}!g' $HOST_VARS_FILE_PATH
-
-      if [[ ! -z $VPS_DNS_PROVIDER ]];then
-        DNS_GLUE_RECORDS=${each.value.vps_glue_record}
-        if [[ $DNS_GLUE_RECORDS == "true" ]];then
-          ansible -i $INVENTORY_PATH -m import_role -a name=$ANSIBLE_PATH/roles/configure_${each.value.vps_dns_provider}_glue_records -e "dns_api_key=${var.dns_token}" ${each.key}
-        else
-          ansible -i $INVENTORY_PATH -m import_role -a name=$ANSIBLE_PATH/roles/configure_${each.value.vps_dns_provider}_dns_records -e "dns_api_key=${var.dns_token}" ${each.key}
-        fi
-      fi
-
-      if [[ ! -z $VPS_SERVICE_TYPE && -f $ANSIBLE_PLAYBOOK_SERVICE ]];then
-        ansible-playbook -i $INVENTORY_PATH -e c2_framework=${each.value.vps_c2_framework} --limit ${each.key} $ANSIBLE_PLAYBOOK_SERVICE
-      fi
     EOT
   }
 }
@@ -100,4 +90,35 @@ resource "aws_eip" "eip" {
     }
 
     depends_on = [aws_instance.instance]
+}
+
+# Install and Configure services for EC2 instances
+resource "null_resource" "ec2" {
+    for_each = var.hosts
+
+    provisioner "local-exec" {
+        interpreter = ["/bin/bash", "-c"]
+        command = <<-EOT
+          ANSIBLE_PATH=${var.ansible_path}
+          export ANSIBLE_CONFIG=$ANSIBLE_PATH/ansible.cfg
+          INVENTORY_PATH=$ANSIBLE_PATH/${var.op_name}_inventory
+          VPS_DNS_PROVIDER=${each.value.vps_dns_provider}
+          VPS_SERVICE_TYPE=${each.value.vps_service_type}
+          ANSIBLE_PLAYBOOK_SERVICE=$ANSIBLE_PATH/init-$VPS_SERVICE_TYPE.yml
+          if [[ ! -z $VPS_DNS_PROVIDER ]];then
+            DNS_GLUE_RECORDS=${each.value.vps_glue_record}
+            if [[ $DNS_GLUE_RECORDS == "true" ]];then
+              ansible -i $INVENTORY_PATH -m import_role -a name=$ANSIBLE_PATH/roles/configure_${each.value.vps_dns_provider}_glue_records -e "dns_api_key=${var.dns_token}" ${each.key}
+            else
+              ansible -i $INVENTORY_PATH -m import_role -a name=$ANSIBLE_PATH/roles/configure_${each.value.vps_dns_provider}_dns_records -e "dns_api_key=${var.dns_token}" ${each.key}
+            fi
+          fi
+
+          if [[ ! -z $VPS_SERVICE_TYPE && -f $ANSIBLE_PLAYBOOK_SERVICE ]];then
+            ansible-playbook -i $INVENTORY_PATH -e c2_framework=${each.value.vps_c2_framework} --limit ${each.key} $ANSIBLE_PLAYBOOK_SERVICE
+          fi
+        EOT
+    }
+
+    depends_on = [aws_eip.eip]
 }

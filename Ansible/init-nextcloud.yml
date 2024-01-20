@@ -1,0 +1,9 @@
+# Install & Configure a new NextCloud instance
+- hosts: nextcloud
+  gather_facts: true
+  vars:
+   docker_app : nextcloud
+   docker_startup_script: startNextCloud.sh
+  roles:
+    - install_docker
+    - setup_docker_container

@@ -1,0 +1,76 @@
+---
+# tasks file for install_nginx
+
+- name: Install NGINX service (using apt tool)
+  apt:
+    update_cache: yes
+    pkg: nginx
+    state: present
+  when:
+   - ansible_pkg_mgr == "apt"
+  become: yes
+
+- name: Configure NGINX service
+  template:
+    src: nginx.conf.j2
+    dest: /etc/nginx/nginx.conf
+  become: yes
+
+- name: Create the GeoIP folder
+  file:
+    path: '{{ item }}'
+    state: directory
+  with_items:
+    - '/etc/nginx/geoip'
+  become: yes
+
+- name: Copy the NGINX GeoIP files
+  copy:
+    src: "{{ role_path }}/files/geoip/"
+    dest: /etc/nginx/geoip
+    mode: '0644'
+  become: yes
+
+- name: Configure the virtual host
+  template:
+    src: "{{ virtual_host_template }}"
+    dest: /etc/nginx/sites-available/default
+  become: yes
+
+- name: Enable the virtual host
+  file:
+    src: /etc/nginx/sites-available/default
+    dest: /etc/nginx/sites-enabled/default
+    state: link
+  become: yes
+
+- name: Check if a DHE parameter file exists
+  stat:
+    path: /etc/ssl/certs/dhparam.pem
+  register: dhparam_file
+
+- name: Generate a DHE parameter file
+  shell: "openssl dhparam -out /etc/ssl/certs/dhparam.pem 2048 && chmod 644 /etc/ssl/certs/dhparam.pem"
+  args:
+    executable: /bin/bash
+  register: dhparam_out
+  when: not dhparam_file.stat.exists
+  become: yes
+
+- debug: 
+    var: dhparam_out.stdout_lines
+  when: dhparam_out is defined and (dhparam_out.stdout_lines | default([]) | length > 0)
+
+- name: Enable NGINX service
+  service:
+    name: nginx
+    enabled: yes
+  become: yes
+
+- name: Start/Restart NGINX service
+  service:
+    name: nginx
+    state: restarted
+  become: yes
+  when: noautostart is not defined or not noautostart
+  

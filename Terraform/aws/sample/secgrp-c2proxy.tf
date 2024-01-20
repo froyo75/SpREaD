@@ -1,1 +1,0 @@
-../secgrp-c2proxy.tf

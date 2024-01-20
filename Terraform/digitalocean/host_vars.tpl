@@ -11,5 +11,6 @@ service_type: ${vps_service_type}
 dns_template: ${vps_dns_template}
 dkim_domain_key: ${vps_smtp_dkim_domain_key}
 dkim_selector: ${vps_smtp_dkim_selector}
+cdn_endpoints: ${vps_cdn_endpoints}
 c2_mode: ${c2_mode}
 c2_framework: ${c2_framework}

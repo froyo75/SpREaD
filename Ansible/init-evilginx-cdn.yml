@@ -1,0 +1,13 @@
+# Install & Configure a new Evilginx instance with CDN support
+- hosts: evilginx
+  gather_facts: true
+  vars:
+   virtual_host_template: evilginx-cdn.j2
+   web_service: nginx
+   docker_app : evilginx-cdn
+   docker_startup_script: startEvilGinx.sh
+  roles:
+    - install_docker
+    - setup_docker_container
+    - configure_letsencrypt
+    - install_nginx

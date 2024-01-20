@@ -1,0 +1,14 @@
+{
+    "blacklist": {
+      "mode": "unauth"
+    },
+    "general": {
+      "bind_ipv4": "",
+      "dns_port": 53,
+      "domain": "",
+      "external_ipv4": "PUBLIC_IP",
+      "https_port": 443,
+      "ipv4": "",
+      "unauth_url": "https://www.microsoft365.com"
+    }
+}

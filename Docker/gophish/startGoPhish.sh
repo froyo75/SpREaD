@@ -9,6 +9,6 @@ if [[ -f ${ENV_FILE} ]]; then
 		sed -i 's/TRACK_PARAMETER/'"${TRACK_PARAMETER}"'/g' ${REDIRECT_RULES}
 		sed -i 's/RECIPIENT_PARAMETER/'"${RECIPIENT_PARAMETER}"'/g' ${REDIRECT_RULES}
 	fi
-	docker-compose up -d
+	docker compose up -d
 	docker image prune -f
 fi

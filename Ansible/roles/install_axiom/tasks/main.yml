@@ -7,6 +7,9 @@
     pkg: 
     - git
     - ca-certificates
+    - tmux
+    - screen
+    - p7zip-full
     state: present
   when:
    - ansible_pkg_mgr == "apt"

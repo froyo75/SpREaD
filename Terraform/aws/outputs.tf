@@ -32,5 +32,16 @@ resource "local_file" "ansible_inventory" {
             k => v.vps_domain
          })
      })
-     filename = "${var.ansible_path}/${var.op_name}_inventory/hosts.yml"
+    filename = "${var.ansible_path}/${var.op_name}_inventory/hosts.yml"
+}
+
+# Backup inventory file for Ansible
+resource "null_resource" "backup" {
+    provisioner "local-exec" {
+        command = <<EOT
+        if [ -f "${var.ansible_path}/${var.op_name}_inventory/hosts.yml" ]; then
+            cp ${var.ansible_path}/${var.op_name}_inventory/hosts.yml ${var.ansible_path}/${var.op_name}_inventory/hosts.yml.$(date +%s)
+        fi
+        EOT
+    }
 }

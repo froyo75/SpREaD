@@ -1,6 +1,10 @@
 ---
 # tasks file for harden_sshd
 
+- name: Check if a specific SSH folder is defined
+  local_action: stat path="{{ ssh_authorized_keys_folder }}"
+  register: authorized_keys_folder
+
 - name: Set authorized key
   authorized_key:
     user: "{{ ansible_user }}"
@@ -9,7 +13,8 @@
     key_options: "{{ authorized_key_options }}"
   with_fileglob:
     - "{{ ssh_authorized_keys_folder }}/*.pub"
-
+  when: authorized_keys_folder.stat.exists
+  
 - name: Hardening SSHD config
   template:
     src: sshd_config.j2

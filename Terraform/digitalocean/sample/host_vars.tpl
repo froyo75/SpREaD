@@ -1,1 +1,16 @@
-../host_vars.tpl
+ansible_host: ${ansible_host}
+ansible_port: ${ansible_port}
+ansible_user: ${ansible_user}
+server_domain: ${vps_domain}
+sshd_port: ${vps_sshd_port}
+ssh_authorized_keys_folder: ${vps_ssh_authorized_keys_folder}
+authorized_key_options: ${vps_authorized_key_options}
+admin_email_address: ${vps_admin_email_address}
+timezone: ${vps_timezone}
+service_type: ${vps_service_type}
+dns_template: ${vps_dns_template}
+dkim_domain_key: ${vps_smtp_dkim_domain_key}
+dkim_selector: ${vps_smtp_dkim_selector}
+cdn_endpoints: ${vps_cdn_endpoints}
+c2_mode: ${c2_mode}
+c2_framework: ${c2_framework}

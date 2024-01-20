@@ -1,8 +1,8 @@
 op_name = "rtX"
 
 hosts = {
-  "rtX-c2server-ratel" = {
-    do_name                        = "c2server-ratel"
+  "rtX-c2-ratel" = {
+    do_name                        = "c2-ratel"
     do_image                       = "debian-10-x64"
     do_size                        = "s-2vcpu-4gb-intel"
     do_region                      = "ams3"
@@ -20,11 +20,12 @@ hosts = {
     vps_dns_template               = ""
     vps_smtp_dkim_domain_key       = ""
     vps_smtp_dkim_selector         = ""
+    vps_cdn_endpoints              = ""
     vps_c2_mode                    = "ratel"
     vps_c2_framework               = "brc4"
   },
-  "rtX-c2server-boomerang" = {
-    do_name                        = "c2server-boomerang"
+  "rtX-c2-boomerang" = {
+    do_name                        = "c2-boomerang"
     do_image                       = "debian-10-x64"
     do_size                        = "s-2vcpu-2gb-intel"
     do_region                      = "fra1"
@@ -42,6 +43,7 @@ hosts = {
     vps_dns_template               = ""
     vps_smtp_dkim_domain_key       = ""
     vps_smtp_dkim_selector         = ""
+    vps_cdn_endpoints              = ""
     vps_c2_mode                    = "boomerang"
     vps_c2_framework               = "brc4"
   }

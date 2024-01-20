@@ -21,10 +21,17 @@ all:
         ${content_key}:
 %{ endif ~}
 %{~ endfor ~}
-    evilginx2:
+    nextcloud:
       hosts:
 %{ for content_key, content_value in content }
-%{~ if length(regexall("evilginx2", content_key)) > 0 ~}
+%{~ if length(regexall("nextcloud", content_key)) > 0 ~}
+        ${content_key}:
+%{ endif ~}
+%{~ endfor ~}
+    evilginx:
+      hosts:
+%{ for content_key, content_value in content }
+%{~ if length(regexall("evilginx", content_key)) > 0 ~}
         ${content_key}:
 %{ endif ~}
 %{~ endfor ~}
