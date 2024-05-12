@@ -5,9 +5,9 @@ FROM alpine:latest AS build
 
 LABEL maintainer="froyo75@users.noreply.github.com"
 
-ARG GOLANG_VERSION=1.16
+ARG GOLANG_VERSION=1.22.2
 ARG GOPATH=/opt/go
-ARG GITHUB_USER="gophish"
+ARG GITHUB_USER="kgretzky"
 ARG GOPHISH_REPOSITORY="github.com/${GITHUB_USER}/gophish"
 ARG INSTALL_PACKAGES="go git bash npm"
 ARG PROJECT_DIR="${GOPATH}/src/${GOPHISH_REPOSITORY}"
@@ -19,7 +19,7 @@ RUN apk add --no-cache ${INSTALL_PACKAGES}
 
 # Install & Configure Go
 RUN set -ex \
-    && wget https://dl.google.com/go/go${GOLANG_VERSION}.src.tar.gz && tar -C /usr/local -xzf go$GOLANG_VERSION.src.tar.gz \
+    && wget https://go.dev/dl/go${GOLANG_VERSION}.src.tar.gz && tar -C /usr/local -xzf go$GOLANG_VERSION.src.tar.gz \
     && rm go${GOLANG_VERSION}.src.tar.gz \
     && cd /usr/local/go/src && ./make.bash \
 # Clone GOPHISH Repository
@@ -50,6 +50,7 @@ RUN set -ex \
     && sed -i 's/rid=/'"${RECIPIENT_PARAMETER}"'=/g' static/js/dist/app/campaign_results.min.js
 
 # Build GOPHISH
+ENV PATH="/usr/local/go/bin:$PATH"
 RUN set -x \
     && go get -v && go build -v \
     && cp -v gophish ${GOPHISH_BIN} \
