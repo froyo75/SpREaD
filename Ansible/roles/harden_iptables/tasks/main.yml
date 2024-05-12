@@ -2,6 +2,7 @@
 # tasks file for harden_iptables
 
 - name: Configure rsyslog service
+  ignore_errors: yes
   copy:
     src: iptables.conf
     dest: /etc/rsyslog.d/iptables.conf
@@ -10,12 +11,14 @@
   become: yes
 
 - name: Restart rsyslog service
+  ignore_errors: yes
   service:
     name: rsyslog
     state: restarted
   become: yes
 
 - name: Configure logrotate service
+  ignore_errors: yes
   copy:
     src: iptables
     dest: /etc/logrotate.d/iptables
