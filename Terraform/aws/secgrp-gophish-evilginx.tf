@@ -1,6 +1,6 @@
 resource "aws_security_group" "gophish-evilginx" {
   name = "gophish-evilginx"
-  description = "Allow only SSH, HTTP and HTTPS traffic"
+  description = "Allow only SSH traffic"
 
   ingress {
     from_port   = 2222
