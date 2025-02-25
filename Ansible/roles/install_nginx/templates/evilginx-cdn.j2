@@ -1,6 +1,6 @@
 geo $allow_azure { 
-    include ./geoip/azure_cdn.conf;
     default 1;
+    include ./geoip/azure_cdn.conf;
 }
 
 server {
@@ -31,6 +31,14 @@ server {
  add_header X-XSS-Protection "1; mode=block";
  access_log /var/log/nginx/access.log combined;
  error_log  /var/log/nginx/error.log error;
+
+ if ($allow_azure = 1) {
+        return 500;
+ }
+
+ if ($host !~ "^({{ cdn_endpoints | replace(', ', '|') }})$") {
+        return 500;
+ }
 
  location / {
       resolver 127.0.0.11 valid=10s;
