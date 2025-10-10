@@ -39,7 +39,7 @@
 - name: Copy the Axiom config file to the remote host
   copy:
     src: "{{ config_path }}"
-    dest: ~/.axiom
+    dest: ~/.axiom/axiom.json
 
 - name: Add ~/.axiom/interact to PATH
   lineinfile:
