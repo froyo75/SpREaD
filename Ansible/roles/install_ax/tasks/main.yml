@@ -1,10 +1,10 @@
 ---
-# tasks file for install_axiom
+# tasks file for install_ax
 
 - name: Install the required packages (using apt tool)
   apt:
     update_cache: yes
-    pkg: 
+    pkg:
     - git
     - ca-certificates
     - tmux
@@ -16,60 +16,58 @@
   become: yes
 
 - name: Check if config path exists
-  local_action: stat path="axiom/{{ inventory_hostname }}/axiom.json"
+  local_action: stat path="ax/{{ inventory_hostname }}/axiom.json"
   register: config_path
 
 - name: Set config path variable
   set_fact: 
-    config_path: "{% if not config_path.stat.exists %}axiom/default.json{% else %}axiom/{{ inventory_hostname }}/axiom.json{% endif %}"
+    config_path: "{% if not config_path.stat.exists %}ax/default.json{% else %}ax/{{ inventory_hostname }}/axiom.json{% endif %}"
 
-- name: Clone Axiom repository
-  shell: git clone https://github.com/pry0cc/axiom ~/.axiom/
-  when:
-   - ansible_distribution == "Debian"
+- name: Check if ~/.axiom directory exists
+  stat:
+    path: ~/.axiom
+  register: axiom_dir
+
+- name: Clone Ax repository
+  shell: git clone https://github.com/attacksurge/ax.git ~/.axiom/
+  when: not axiom_dir.stat.exists
   register: git
 
 - debug: var=git.stdout_lines
-
-- name: Fix the Axiom configuration wizard
-  shell: sed -i 's/openssh-server //' ~/.axiom/interact/axiom-configure
-  when:
-   - ansible_distribution == "Debian"
-  register: fix
-
-- debug: var=fix.stdout_lines
+  when: git is defined and git.changed
 
 - name: Copy the Axiom config file to the remote host
   copy:
     src: "{{ config_path }}"
-    dest: ~/
+    dest: ~/.axiom
 
-- name: Setup and configure the axiom controller
-  shell: ~/.axiom/interact/axiom-configure --shell Zsh --unattended --config "$(cat ~/axiom.json | tr '\n' ' ' | tr -s ' ')"
-  when:
-   - ansible_distribution == "Debian"
+- name: Add ~/.axiom/interact to PATH
+  lineinfile:
+    path: ~/.bashrc
+    line: 'export PATH="$HOME/.axiom/interact:$PATH"'
+    create: yes
+    mode: '0644'
+
+- name: Add ~/.axiom/interact to PATH for zsh
+  lineinfile:
+    path: ~/.zshrc
+    line: 'export PATH="$HOME/.axiom/interact:$PATH"'
+    create: yes
+    mode: '0644'
+
+- name: Setup and configure the Ax controller
+  shell: ax configure --setup --shell zsh --unattended --config ~/.axiom/axiom.json
+  environment:
+    PATH: "{{ ansible_env.HOME }}/.axiom/interact:{{ ansible_env.PATH }}"
   register: setup
 
 - debug: var=setup.stdout_lines
-
-- name: Building a new axiom image
-  shell: ~/.axiom/interact/axiom-build {{ axiom_provisioner }}
-  when:
-   - ansible_distribution == "Debian"
-  register: build
-
-- debug: var=build.stdout_lines
 
 - name: Set Zsh as the default shell for root user
   user:
     name: "{{ ansible_user }}"
     shell: /bin/zsh
   become: yes
-
-- name: Remove the Axiom config file from the remote host
-  file:
-    path: "~/axiom.json"
-    state: absent
 
 - name: Copy the Axiom scripts to the remote host
   synchronize:
@@ -85,6 +83,14 @@
   copy:
     src: "{{ role_path }}/files/modules/"
     dest: ~/.axiom/modules
+
+- name: Building a new Ax image
+  shell: ax build {{ axiom_provisioner }}
+  environment:
+    PATH: "{{ ansible_env.HOME }}/.axiom/interact:{{ ansible_env.PATH }}"
+  register: build
+
+- debug: var=build.stdout_lines
 
 - name: Extract provider value from config file
   shell: grep -w "provider" "{{ config_path }}" | awk -F ':' '{print $2}' | tr -d '",  \n'

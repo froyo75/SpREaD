@@ -1,4 +1,0 @@
-[{
-    "command":"cat input | /home/op/go/bin/dnsx -ro -ptr -r /home/op/lists/resolvers.txt -o output",
-    "ext":"txt"
-}]

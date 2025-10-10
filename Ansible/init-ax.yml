@@ -1,0 +1,5 @@
+# Install & Configure a new Ax controller
+- hosts: ax
+  gather_facts: true
+  roles:
+    - install_ax

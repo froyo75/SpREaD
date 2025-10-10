@@ -4,7 +4,7 @@ aws_region = "london"
 hosts = {
   "rtX-gophish-toto-com" = {
     aws_name                       = "toto.com"
-    aws_image                      = "ami-0e16e78fb9cb2fc71"
+    aws_image                      = "ami-0b387b9daf1ffbd0c"
     aws_type                       = "t3.micro"
     aws_environment                = "PROD"
     ansible_user                   = "admin"
@@ -28,7 +28,7 @@ hosts = {
   },
   "rtX-gophish-tata-com" = {
     aws_name                       = "tata.com"
-    aws_image                      = "ami-0e16e78fb9cb2fc71"
+    aws_image                      = "ami-0b387b9daf1ffbd0c"
     aws_type                       = "t3.micro"
     aws_environment                = "PROD"
     ansible_user                   = "admin"

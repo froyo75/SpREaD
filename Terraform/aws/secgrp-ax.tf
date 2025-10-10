@@ -1,5 +1,5 @@
-resource "aws_security_group" "axiom" {
-  name = "axiom"
+resource "aws_security_group" "secgrp" {
+  name = "ax"
   description = "Allow only SSH traffic"
 
   ingress {
@@ -24,6 +24,6 @@ resource "aws_security_group" "axiom" {
   }
 
   tags = {
-    Name = format("%s-%s", var.op_name, "axiom")
+    Name = format("%s-%s", var.op_name, "ax")
   }
 }

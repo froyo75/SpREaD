@@ -1,4 +1,4 @@
-resource "aws_security_group" "mailu" {
+resource "aws_security_group" "secgrp" {
   name = "mailu"
   description = "Allow only SSH, HTTP, HTTPS, SMTP, POP3, and IMAP traffic"
 

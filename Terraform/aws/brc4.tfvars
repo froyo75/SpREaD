@@ -4,7 +4,7 @@ aws_region = "paris"
 hosts = {
   "rtX-c2-ratel" = {
     aws_name                       = "c2-ratel"
-    aws_image                      = "ami-05bfef86a955a699e"
+    aws_image                      = "ami-0308d3033923f20b2"
     aws_type                       = "t3.medium"
     aws_environment                = "PROD"
     ansible_user                   = "admin"
@@ -28,7 +28,7 @@ hosts = {
   },
   "rtX-c2-boomerang" = {
     aws_name                       = "c2-boomerang"
-    aws_image                      = "ami-05bfef86a955a699e"
+    aws_image                      = "ami-0308d3033923f20b2"
     aws_type                       = "t3.medium"
     aws_environment                = "PROD"
     ansible_user                   = "admin"

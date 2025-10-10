@@ -4,7 +4,7 @@ aws_region = "stockholm"
 hosts = {
   "rtX-c2proxy-toto-com" = {
     aws_name                       = "toto.com"
-    aws_image                      = "ami-02c68996dd3d909c1"
+    aws_image                      = "ami-0955d1e82085ce3e8"
     aws_type                       = "t3.small"
     aws_environment                = "PROD"
     ansible_user                   = "admin"
@@ -28,7 +28,7 @@ hosts = {
   },
   "rtX-c2proxy-tata-com" = {
     aws_name                       = "tata.com"
-    aws_image                      = "ami-02c68996dd3d909c1"
+    aws_image                      = "ami-0955d1e82085ce3e8"
     aws_type                       = "t3.small"
     aws_environment                = "PROD"
     ansible_user                   = "admin"

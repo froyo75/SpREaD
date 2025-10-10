@@ -1,4 +1,4 @@
-resource "aws_security_group" "evilginx-cdn" {
+resource "aws_security_group" "secgrp" {
   name = "evilginx-cdn"
   description = "Allow only SSH, HTTP, HTTPS"
 

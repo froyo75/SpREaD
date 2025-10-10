@@ -1,4 +1,4 @@
-resource "aws_security_group" "gophish" {
+resource "aws_security_group" "secgrp" {
   name = "gophish"
   description = "Allow only SSH, HTTP and HTTPS traffic"
 

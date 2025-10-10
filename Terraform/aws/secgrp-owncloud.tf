@@ -1,4 +1,4 @@
-resource "aws_security_group" "owncloud" {
+resource "aws_security_group" "secgrp" {
   name = "owncloud"
   description = "Allow only SSH traffic"
 

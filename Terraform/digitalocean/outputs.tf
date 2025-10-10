@@ -49,7 +49,7 @@ resource "null_resource" "backup" {
     provisioner "local-exec" {
         command = <<EOT
         if [ -f "${var.ansible_path}/${var.op_name}_inventory/hosts.yml" ]; then
-            cp ${var.ansible_path}/${var.op_name}_inventory/hosts.yml ${var.ansible_path}/${var.op_name}_inventory/hosts.yml.$(date +%s)
+            cp ${var.ansible_path}/${var.op_name}_inventory/hosts.yml ${var.ansible_path}/${var.op_name}_inventory/backup_hosts.yml.$(date +%s)
         fi
         EOT
     }

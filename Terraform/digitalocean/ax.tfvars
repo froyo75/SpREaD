@@ -1,8 +1,8 @@
 op_name = "rtX"
 
 hosts = {
-  "rtX-axiom" = {
-    do_name                        = "recon-axiom"
+  "rtX-ax" = {
+    do_name                        = "recon-ax"
     do_image                       = "debian-10-x64"
     do_size                        = "s-1vcpu-2gb-intel"
     do_region                      = "fra1"
@@ -14,7 +14,7 @@ hosts = {
     vps_sshd_port                  = 2222
     vps_admin_email_address        = "rtops@example.com"
     vps_timezone                   = "Europe/Paris"
-    vps_service_type               = "axiom"
+    vps_service_type               = "ax"
     vps_dns_provider               = ""
     vps_glue_record		   = false
     vps_dns_template               = ""

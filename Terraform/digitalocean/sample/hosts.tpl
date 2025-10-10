@@ -56,10 +56,10 @@ all:
         ${content_key}:
 %{ endif ~}
 %{~ endfor ~}
-    axiom:
+    ax:
       hosts:
 %{ for content_key, content_value in content }
-%{~ if length(regexall("axiom", content_key)) > 0 ~}
+%{~ if length(regexall("ax", content_key)) > 0 ~}
         ${content_key}:
 %{ endif ~}
 %{~ endfor ~}

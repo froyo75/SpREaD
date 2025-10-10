@@ -4,7 +4,7 @@ aws_region = "ireland"
 hosts = {
   "rtX-clonesite-toto-com" = {
     aws_name                       = "toto.com"
-    aws_image                      = "ami-05bfef86a955a699e"
+    aws_image                      = "ami-0c9e5f4bbf9701d5d"
     aws_type                       = "t3.small"
     aws_environment                = "PROD"
     ansible_user                   = "admin"
@@ -28,7 +28,7 @@ hosts = {
   },
   "rtX-clonesite-tata-com" = {
     aws_name                       = "tata.com"
-    aws_image                      = "ami-05bfef86a955a699e"
+    aws_image                      = "ami-0c9e5f4bbf9701d5d"
     aws_type                       = "t3.small"
     aws_environment                = "PROD"
     ansible_user                   = "admin"

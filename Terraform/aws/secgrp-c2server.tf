@@ -1,4 +1,4 @@
-resource "aws_security_group" "c2server" {
+resource "aws_security_group" "secgrp" {
   name = "c2server"
   description = "Allow only SSH, HTTP and HTTPS traffic"
 

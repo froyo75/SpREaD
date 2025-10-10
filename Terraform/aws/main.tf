@@ -1,7 +1,6 @@
 # Create, Install and Configure AWS EC2 using Ansible
 
-/*
-# Get SSH key
+/*# Get SSH key
 data "aws_key_pair" "current_ssh_key" {
   key_name = var.aws_ssh_key_name
 }*/
@@ -18,7 +17,7 @@ resource "aws_instance" "instance" {
   ami                    = each.value.aws_image
   instance_type          = each.value.aws_type
   key_name               = var.aws_ssh_key_name
-  security_groups        = [each.value.vps_service_type]
+  vpc_security_group_ids = [aws_security_group.secgrp.id]
   monitoring = true
 
   root_block_device {
@@ -37,7 +36,6 @@ resource "aws_instance" "instance" {
       ANSIBLE_PATH=${var.ansible_path}
       export ANSIBLE_CONFIG=$ANSIBLE_PATH/ansible.cfg
       INVENTORY_PATH=$ANSIBLE_PATH/${var.op_name}_inventory
-      HOSTS_FILE_PATH=$INVENTORY_PATH/hosts.yml
       HOST_VARS_FILE_PATH=$INVENTORY_PATH/host_vars/${each.key}
       SSH_DELAY=30
       SSH_PRIVATE_KEY_FILE=$(realpath ${var.aws_ssh_private_key})

@@ -4,7 +4,8 @@
     "domain": "",
     "provider":"do",
     "default_image":"axiom",
-    "default_size": "s-1vcpu-1gb",
+    "default_size": "s-2vcpu-2gb-intel",
     "hunter_key": "",
-    "email": ""
+    "email": "",
+    "default_disk_size": "35"
 }

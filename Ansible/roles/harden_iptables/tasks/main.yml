@@ -1,31 +1,6 @@
 ---
 # tasks file for harden_iptables
 
-- name: Configure rsyslog service
-  ignore_errors: yes
-  copy:
-    src: iptables.conf
-    dest: /etc/rsyslog.d/iptables.conf
-    mode: '0600'
-    owner: root
-  become: yes
-
-- name: Restart rsyslog service
-  ignore_errors: yes
-  service:
-    name: rsyslog
-    state: restarted
-  become: yes
-
-- name: Configure logrotate service
-  ignore_errors: yes
-  copy:
-    src: iptables
-    dest: /etc/logrotate.d/iptables
-    mode: '0644'
-    owner: root
-  become: yes
-
 - name: Install "iptables-persistent" package (using apt tool)
   apt:
     update_cache: yes

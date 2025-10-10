@@ -1,4 +1,4 @@
-resource "aws_security_group" "evilginx" {
+resource "aws_security_group" "secgrp" {
   name = "evilginx"
   description = "Allow only SSH, HTTP, HTTPS and DNS traffic"
 

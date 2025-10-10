@@ -1,4 +1,4 @@
-resource "aws_security_group" "nextcloud" {
+resource "aws_security_group" "secgrp" {
   name = "nextcloud"
   description = "Allow only SSH traffic"
 

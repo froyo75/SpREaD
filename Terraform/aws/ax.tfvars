@@ -2,9 +2,9 @@ op_name = "rtX"
 aws_region = "paris"
 
 hosts = {
-  "rtX-axiom" = {
-      aws_name                       = "recon-axiom"
-      aws_image                      = "ami-05bfef86a955a699e"
+  "rtX-ax" = {
+      aws_name                       = "recon-ax"
+      aws_image                      = "ami-0308d3033923f20b2"
       aws_type                       = "t3.small"
       aws_environment                = "PROD"
       ansible_user                   = "admin"
@@ -15,15 +15,15 @@ hosts = {
       vps_sshd_port                  = 2222
       vps_admin_email_address        = "rtops@example.com"
       vps_timezone                   = "Europe/Paris"
-      vps_service_type               = "axiom"
+      vps_service_type               = "ax"
       vps_dns_provider               = ""
-	    vps_glue_record				 = false
+	  vps_glue_record				 = false
       vps_dns_template               = ""
       vps_smtp_dkim_domain_key       = ""
       vps_smtp_dkim_selector         = ""
       vps_cdn_endpoints              = ""
       vps_c2_mode                    = ""
       vps_c2_framework               = ""
-      vps_volume_size                = 20
+      vps_volume_size                = 25
   }
 }

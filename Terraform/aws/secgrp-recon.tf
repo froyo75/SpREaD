@@ -1,4 +1,4 @@
-resource "aws_security_group" "recon" {
+resource "aws_security_group" "secgrp" {
   name = "recon"
   description = "Allow only SSH traffic"
 
