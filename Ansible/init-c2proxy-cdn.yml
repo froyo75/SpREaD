@@ -1,0 +1,12 @@
+# Install & Configure a C2Proxy with CDN support
+- hosts: c2proxy
+  gather_facts: true
+  vars:
+   c2_ip_address: 127.0.0.1
+   redir_target: https://www.office.com
+   virtual_host_template: c2proxy-cdn.j2
+   web_service: nginx
+   noautostart: true
+  roles:
+    - configure_letsencrypt
+    - install_nginx
