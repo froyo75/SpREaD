@@ -153,7 +153,7 @@ genInfra() {
 }
 
 if [[ $# -eq 0 || -z "$1" || -z "$2" || -z "$3" || -z "$4" || -z "$5" || -z "$6" ]]; then
-	echo "Usage: $0 <Operation Name (example:rtX)> <Admin Email Address (example:rtops@example.com)> <Authorized Keys Folder (example:./ssh/rtX)> <Infra Name (example:mycompany)> <Provider Name (aws|digitalocean|azure)> <Service Type 1,Service Type 2,... (example: recon,ax,simple-smtp,simple-cdn,evilginx,evilginx-cdn,evilginx-cdn-adfs,nextcloud,mailu,gophish,gophish-evilginx,c2proxy,clonesite,brc4,cs,havoc)> [global infra env variables file path (default: ${DEFAULT_TERRA_PATH}/infra.env)]"
+	echo "Usage: $0 <Operation Name (example:rtX)> <Admin Email Address (example:rtops@example.com)> <Authorized Keys Folder (example:./ssh/rtX)> <Infra Name (example:mycompany)> <Provider Name (aws|digitalocean|azure)> <Service Type 1,Service Type 2,... (example: recon,ax,simple-smtp,simple-cdn,evilginx,evilginx-cdn,evilginx-cdn-adfs,nextcloud,mailu,gophish,gophish-evilginx,c2proxy,c2proxy-cdn,clonesite,brc4,cs,havoc)> [global infra env variables file path (default: ${DEFAULT_TERRA_PATH}/infra.env)]"
 else
 	OP=$1
 	ADMIN_EMAIL_ADDRESS=$2
@@ -171,13 +171,13 @@ else
 
 	case "$PROVIDER" in
 	aws)
-		AVAILABLE_SERVICES=("recon" "ax" "evilginx" "evilginx-cdn" "nextcloud" "mailu" "gophish" "gophish-evilginx" "c2proxy" "clonesite" "brc4" "cs" "havoc")
+		AVAILABLE_SERVICES=("recon" "ax" "evilginx" "evilginx-cdn" "nextcloud" "mailu" "gophish" "gophish-evilginx" "c2proxy" "c2proxy-cdn" "clonesite" "brc4" "cs" "havoc")
 		AVAILABLE_TF_FILES=("main.tf" "outputs.tf" "provider.tf" "variables.tf")
 		AVAILABLE_TPL_FILES=("hosts.tpl" "host_vars.tpl")
 		SECURITY_GROUP=1
 	;;
 	digitalocean)
-		AVAILABLE_SERVICES=("recon" "ax" "evilginx" "evilginx-cdn" "nextcloud" "mailu" "gophish" "gophish-evilginx" "c2proxy" "clonesite" "brc4" "cs" "havoc")
+		AVAILABLE_SERVICES=("recon" "ax" "evilginx" "evilginx-cdn" "nextcloud" "mailu" "gophish" "gophish-evilginx" "c2proxy" "c2proxy-cdn" "clonesite" "brc4" "cs" "havoc")
 		AVAILABLE_TF_FILES=("main.tf" "outputs.tf" "provider.tf" "variables.tf")
 		AVAILABLE_TPL_FILES=("hosts.tpl" "host_vars.tpl")
 	;;
@@ -192,13 +192,12 @@ else
 		AVAILABLE_TPL_FILES=("none")
 	;;
 	*)
-	  echo "Usage: $0 <Operation Name (example:rtX)> <Admin Email Address (example:rtops@example.com)> <Authorized Keys Folder (example:./ssh/rtX)> <Infra Name (example:mycompany)> <Provider Name (aws|digitalocean|azure)> <Service Type 1,Service Type 2,... (example: recon,ax,simple-smtp,simple-cdn,evilginx,evilginx-cdn,evilginx-cdn-adfs,nextcloud,mailu,gophish,gophish-evilginx,c2proxy,clonesite,brc4,cs,havoc)> [global infra env variables file path (default: ${DEFAULT_TERRA_PATH}/infra.env)]"
+	  echo "Usage: $0 <Operation Name (example:rtX)> <Admin Email Address (example:rtops@example.com)> <Authorized Keys Folder (example:./ssh/rtX)> <Infra Name (example:mycompany)> <Provider Name (aws|digitalocean|azure)> <Service Type 1,Service Type 2,... (example: recon,ax,simple-smtp,simple-cdn,evilginx,evilginx-cdn,evilginx-cdn-adfs,nextcloud,mailu,gophish,gophish-evilginx,c2proxy,c2proxy-cdn,clonesite,brc4,cs,havoc)> [global infra env variables file path (default: ${DEFAULT_TERRA_PATH}/infra.env)]"
 	  exit 1
 	;;
 	esac
 
 	genInfra ${OP} ${ADMIN_EMAIL_ADDRESS} ${AUTHORIZED_KEYS_FOLDER} ${INFRA_NAME} ${PROVIDER} ${LIST_OF_SERVICES} ${AVAILABLE_SERVICES} ${AVAILABLE_TF_FILES} ${AVAILABLE_TPL_FILES} ${SECURITY_GROUP} ${INFRA_ENV}
-	
+
 	echo -e "\e[35m[*] To deploy or destroy your new Terraforma infrastructure, simply run the 'init-infra.sh' bash script located in your new infra folder '${DEFAULT_TERRA_PATH}/${PROVIDER}/${INFRA_NAME}/' and pass a specific variables definitions !\e[0m"
 fi
-
