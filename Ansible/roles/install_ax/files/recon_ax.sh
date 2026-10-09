@@ -1,6 +1,6 @@
 #!/bin/bash
 
-#set -e
+set -uo pipefail
 
 TOOLS_FOLDER=.
 GETINFOS_SCRIPT_FILEPATH=getinfos.sh
@@ -26,7 +26,7 @@ checkFileExists() {
     FILEPATH=$1
     if [[ -s "${FILEPATH}" ]]; then
         echo $(wc -l < ${FILEPATH})
-    else 
+    else
         echo 0
     fi
 }
@@ -40,7 +40,7 @@ createFolder() {
 }
 
 if [[ $# -eq 0 || -z "$1" ]]; then
-	echo "Usage: $0 <createfleet|getinfosfleet|deletefleet|recon|gau|gowitness|nuclei>"
+	echo "Usage: $0 <createfleet|getinfosfleet|deletefleet|recon|portscans|gau|gowitness|nuclei>"
 else
 	ACTION=$1
 	case "$ACTION" in
@@ -129,13 +129,13 @@ else
 			ax scan ${DOMAIN_LIST} -m subfinder --anew -o ${OUTPUT_FOLDER}/subdomains/all_subfinder_subs.txt --quiet --rm-logs 1>/dev/null
 			nb_subdoms=$(checkFileExists ${OUTPUT_FOLDER}/subdomains/all_subfinder_subs.txt)
 			echo "[+] ${nb_subdoms} subdomains identified."  | tee -a ${OUTPUT_FOLDER}/logs/${ACTION}_${LOG_FILEPATH}
-			
+
             if [[ ${nb_cidr_list} > 0 ]]; then
                 echo -e "\e[32m[*] Retrieving all subdomains of all IP addresses from CIDR ranges (active recon using reverse DNS lookups)...\e[0m" | tee -a ${OUTPUT_FOLDER}/logs/${ACTION}_${LOG_FILEPATH}
                 ax scan ${CIDR_LIST} -m dnsx-ptr --anew -o ${OUTPUT_FOLDER}/subdomains/all_reverse_subs.txt --quiet --rm-logs 1>/dev/null
                 nb_subdoms=$(checkFileExists ${OUTPUT_FOLDER}/subdomains/all_reverse_subs.txt)
                 echo "[+] ${nb_subdoms} subdomains identified."  | tee -a ${OUTPUT_FOLDER}/logs/${ACTION}_${LOG_FILEPATH}
-                
+
                 echo -e "\e[32m[*] Retrieving all subdomains of all IP addresses from certificates (active recon)...\e[0m" | tee -a ${OUTPUT_FOLDER}/logs/${ACTION}_${LOG_FILEPATH}
                 ax scan ${CIDR_LIST} -m tlsx-san-cn --anew -o ${OUTPUT_FOLDER}/subdomains/all_cidrs_tlsx_subs.txt --quiet --rm-logs 1>/dev/null
                 nb_subdoms=$(checkFileExists ${OUTPUT_FOLDER}/subdomains/all_cidrs_tlsx_subs.txt)
@@ -151,7 +151,7 @@ else
             if [[ ${nb_subdoms} > 0 ]]; then
                 ax scan ${OUTPUT_FOLDER}/subdomains/all_subs.txt -m dnsx-a-re --anew -o ${OUTPUT_FOLDER}/subdomains/all_active_subs.txt --quiet --rm-logs 1>/dev/null
             fi
-			
+
 			ORIGINAL_IFS=${IFS}
 			IFS=$'\n'
 			for active_sub_entry in $(cat ${OUTPUT_FOLDER}/subdomains/all_active_subs.txt);do
@@ -192,13 +192,13 @@ else
 					echo -e "\e[32m[+] Done.\e[0m" | tee -a ${OUTPUT_FOLDER}/logs/${ACTION}_${LOG_FILEPATH}
 				fi
 			fi
-            
+
 			createFolder ${OUTPUT_FOLDER}/services
 			echo -e "\e[32m[*] Enumerating all valid ports for all IP addresses from CIDR ranges (active recon)...\e[0m" | tee -a ${OUTPUT_FOLDER}/logs/${ACTION}_${LOG_FILEPATH}
 			ax scan ${OUTPUT_FOLDER}/ips/all_scans_ips_only.txt -m naabu-full --anew -o ${OUTPUT_FOLDER}/services/all_scans_ips_top_ports_full.txt --quiet --rm-logs 1>/dev/null
 			nb_services=$(checkFileExists ${OUTPUT_FOLDER}/services/all_scans_ips_top_ports_full.txt)
 			echo "[+] ${nb_services} services identified." | tee -a ${OUTPUT_FOLDER}/logs/${ACTION}_${LOG_FILEPATH}
-			
+
 			echo -e "\e[32m[*] Enumerating all valid ports for all subdomains (active recon)...\e[0m" | tee -a ${OUTPUT_FOLDER}/logs/${ACTION}_${LOG_FILEPATH}
 			ax scan ${OUTPUT_FOLDER}/subdomains/all_scans_subs_only.txt -m naabu-full --anew -o ${OUTPUT_FOLDER}/services/all_scans_subs_top_ports_full.txt --quiet --rm-logs 1>/dev/null
 			nb_services=$(checkFileExists ${OUTPUT_FOLDER}/services/all_scans_subs_top_ports_full.txt)
@@ -242,6 +242,13 @@ else
 			FLEET_NAME=$2
 			DATA_LIST=$3
 			OUTPUT_FOLDER=$(realpath $4)
+
+			nb_data_list=$(checkFileExists ${DATA_LIST})
+            if [[ ${nb_data_list} == 0 ]]; then
+                echo -e "\e[31m[!] A list of active IP or Domain's URLs is required.\e[0m"
+                exit 1
+            fi
+
 			createFolder ${OUTPUT_FOLDER}/logs
 
 			ax select ${FLEET_NAME}\*
@@ -253,6 +260,61 @@ else
 			echo "[+] ${nb_urls} known URLs retrieved." | tee -a ${OUTPUT_FOLDER}/logs/${ACTION}_${LOG_FILEPATH}
 		fi
 	;;
+	portscans)
+		if [[ -z "$2" || -z "$3" || -z "$4" ]]; then
+			echo "Usage: $0 $ACTION <FLEET NAME (Only valid characters are allowed: a-z, A-Z, 0-9, . and -)> <List of Domains OR IP addresses from a file> <Output Folder> [NMAP_SV_SCAN]"
+		else
+			FLEET_NAME=$2
+			DATA_LIST=$3
+			OUTPUT_FOLDER=$(realpath $4)
+			NMAP_SCAN=${5^^}
+
+			nb_dom_list=$(checkFileExists ${DATA_LIST})
+			if [[ ${nb_dom_list} == 0 ]]; then
+				echo -e "\e[31m[!] A list of domains or IP addresses is required.\e[0m"
+				exit 1
+			fi
+
+			createFolder ${OUTPUT_FOLDER}/logs
+			ax select ${FLEET_NAME}\*
+
+			createFolder ${OUTPUT_FOLDER}/services
+			echo -e "\e[32m[*] Enumerating all valid ports for all Domains/IP addresses (active recon)...\e[0m" | tee -a ${OUTPUT_FOLDER}/logs/${ACTION}_${LOG_FILEPATH}
+			ax scan ${DATA_LIST} -m naabu-full --anew -o ${OUTPUT_FOLDER}/services/all_scans_ips_top_ports_full.txt --quiet --rm-logs 1>/dev/null
+			nb_services=$(checkFileExists ${OUTPUT_FOLDER}/services/all_scans_ips_top_ports_full.txt)
+			echo "[+] ${nb_services} services identified." | tee -a ${OUTPUT_FOLDER}/logs/${ACTION}_${LOG_FILEPATH}
+
+			if [[ ${nb_services} > 0 ]]; then
+				shuf ${OUTPUT_FOLDER}/services/all_scans_ips_top_ports_full.txt > ${OUTPUT_FOLDER}/services/all_scans_ips_top_ports_full_randomized.txt
+
+				createFolder ${OUTPUT_FOLDER}/http
+				echo -e "\e[32m[*] Detecting HTTP interfaces (active recon)...\e[0m" | tee -a ${OUTPUT_FOLDER}/logs/${ACTION}_${LOG_FILEPATH}
+				ax scan ${OUTPUT_FOLDER}/services/all_scans_ips_top_ports_full_randomized.txt -m httpx --anew -o ${OUTPUT_FOLDER}/http/all_active_http.txt --quiet --rm-logs 1>/dev/null
+				nb_http_services=$(checkFileExists ${OUTPUT_FOLDER}/http/all_active_http.txt)
+				echo "[+] ${nb_http_services} web services identified." | tee -a ${OUTPUT_FOLDER}/logs/${ACTION}_${LOG_FILEPATH}
+
+				if [[ ${NMAP_SCAN} = NMAP_SV_SCAN ]]; then
+					echo -e "\e[32m[*] Running Nmap TCP scans for all services identified (active recon)...\e[0m" | tee -a ${OUTPUT_FOLDER}/logs/${ACTION}_${LOG_FILEPATH}
+					createFolder ${OUTPUT_FOLDER}/services/nmap
+					readarray -t all_active_ports < <(cat ${OUTPUT_FOLDER}/services/all_scans_ips_top_ports_full_randomized.txt | awk -F ':' '{print $2}' | sort -u)
+					for active_port in "${all_active_ports[@]}"; do
+						all_ips_active_port=$(cat ${OUTPUT_FOLDER}/services/all_scans_ips_top_ports_full_randomized.txt | grep -E ":${active_port}$" | awk -F ':' '{print $1}')
+						echo ${all_ips_active_port} | sed 's/ /\n/g' > ${OUTPUT_FOLDER}/services/nmap/${active_port}_IN_PROGRESS
+						ax scan ${OUTPUT_FOLDER}/services/nmap/${active_port}_IN_PROGRESS -m nmapx -p${active_port} -sTVC -Pn -T3 --max-rtt-timeout 2 --min-parallelism 5 --max-rate 1000 -oA ${OUTPUT_FOLDER}/services/nmap/SV_TCP_${active_port} --rm-logs 1>/dev/null
+						rm ${OUTPUT_FOLDER}/services/nmap/${active_port}_IN_PROGRESS
+					done
+					echo -e "\e[32m[+] Done.\e[0m" | tee -a ${OUTPUT_FOLDER}/logs/${ACTION}_${LOG_FILEPATH}
+
+					cat ${DATA_LIST} | sort -u > ${OUTPUT_FOLDER}/services/all_scans_ips.txt
+					echo -e "\e[32m[*] Running Nmap UDP scans for well-known services (active recon)...\e[0m" | tee -a ${OUTPUT_FOLDER}/logs/${ACTION}_${LOG_FILEPATH}
+					ax scan ${OUTPUT_FOLDER}/services/all_scans_ips.txt -m nmapx -pU:161,162,123,53,500,137,111,67,68,69 --open -sUVC -Pn -T3 --max-rtt-timeout 2 --min-parallelism 5 --max-rate 1000 -oA ${OUTPUT_FOLDER}/services/nmap/SV_UDP_ALL_SUBS_IPS --rm-logs 1>/dev/null
+					echo -e "\e[32m[+] Done.\e[0m" | tee -a ${OUTPUT_FOLDER}/logs/${ACTION}_${LOG_FILEPATH}
+				fi
+			else
+				echo -e "\e[31m[!] No open ports found. Skipping Nmap and HTTP interface detection.\e[0m" | tee -a ${OUTPUT_FOLDER}/logs/${ACTION}_${LOG_FILEPATH}
+			fi
+		fi
+    ;;
 	gowitness)
 	  if [[ -z "$2" || -z "$3" || -z "$4" ]]; then
 			echo "Usage: $0 $ACTION <FLEET NAME (Only valid characters are allowed: a-z, A-Z, 0-9, . and -)> <List of active IP OR Domain's URLs from a file> <Output Folder>"
@@ -260,6 +322,13 @@ else
 			FLEET_NAME=$2
 			DATA_LIST=$3
 			OUTPUT_FOLDER=$(realpath $4)
+
+			nb_data_list=$(checkFileExists ${DATA_LIST})
+            if [[ ${nb_data_list} == 0 ]]; then
+                echo -e "\e[31m[!] A list of active IP or Domain's URLs is required.\e[0m"
+                exit 1
+            fi
+
 			createFolder ${OUTPUT_FOLDER}/logs
 
 			ax select ${FLEET_NAME}\*
@@ -281,6 +350,12 @@ else
 			OUTPUT_FOLDER=$(realpath $5)
 			createFolder ${OUTPUT_FOLDER}/logs
 
+			nb_data_list=$(checkFileExists ${DATA_LIST})
+            if [[ ${nb_data_list} == 0 ]]; then
+                echo -e "\e[31m[!] A list of active IP or Domain's URLs is required.\e[0m"
+                exit 1
+            fi
+
 			ax select ${FLEET_NAME}\*
 
 			case "$SCAN_MODE" in
@@ -293,7 +368,8 @@ else
 			intrusive)
 				createFolder ${OUTPUT_FOLDER}/nuclei
 				echo -e "\e[32m[+] Performing intrusive recon on active URLs using 'nuclei' tool...\e[0m" | tee -a ${OUTPUT_FOLDER}/logs/${ACTION}_${LOG_FILEPATH}
-				ax scan ${DATA_LIST} -m nuclei -exclude-templates fuzzing/ -etags intrusive -stats -c 50 -rl 300 -nc -o ${OUTPUT_FOLDER}/nuclei/intrusive_nuclei.txt --quiet --rm-logs 1>/dev/null
+				#ax scan ${DATA_LIST} -m nuclei -exclude-templates fuzzing/ -etags intrusive -stats -c 50 -rl 300 -nc -o ${OUTPUT_FOLDER}/nuclei/intrusive_nuclei.txt --quiet --rm-logs 1>/dev/null
+				ax scan ${DATA_LIST} -m nuclei -severity medium,high,critical -et dos,fuzz,exploit,defacement -stats -c 50 -rl 100 -nc -o ${OUTPUT_FOLDER}/nuclei/intrusive_nuclei.txt --quiet --rm-logs 1>/dev/null
 			;;
 			*)
 			echo "Usage: $0 $ACTION $FLEET_NAME $DATA_LIST <light|intrusive> $OUTPUT_FOLDER"
@@ -327,14 +403,14 @@ else
 			if [[ ${critical_results} > 0 ]]; then
 				echo "[+] ${critical_results} reported as critical." | tee -a ${OUTPUT_FOLDER}/logs/${ACTION}_${LOG_FILEPATH}
 			fi
-			
+
 			echo -e "\e[32m[*] Cleaning empty files...\e[0m"
 			find ${OUTPUT_FOLDER} -type f -empty -delete
 			echo -e "\e[32m[+] Done.\e[0m"
 		fi
 	;;
 	*)
-	  echo "Usage: $0 <createfleet|getinfosfleet|deletefleet|recon|gau|gowitness|nuclei>"
+	    echo "Usage: $0 <createfleet|getinfosfleet|deletefleet|recon|portscans|gau|gowitness|nuclei>"
 	;;
 	esac
 fi
